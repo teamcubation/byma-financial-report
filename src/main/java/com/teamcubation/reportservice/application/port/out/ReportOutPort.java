@@ -1,6 +1,6 @@
 package com.teamcubation.reportservice.application.port.out;
 
-import com.teamcubation.reportservice.domain.model.Report;
+import com.teamcubation.reportservice.domain.model.report.Report;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository;
 
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
-import com.teamcubation.reportservice.domain.model.Report;
+import com.teamcubation.reportservice.domain.model.report.Report;
 
 import java.util.List;
 
