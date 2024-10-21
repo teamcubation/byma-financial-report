@@ -16,4 +16,5 @@ public class Report {
     private LocalDateTime dateTime;
     private String title;
     private List<FilterReport> filters;
+    private String format;
 }
