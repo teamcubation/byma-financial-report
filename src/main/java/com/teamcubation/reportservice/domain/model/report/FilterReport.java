@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.domain.model;
+package com.teamcubation.reportservice.domain.model.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
