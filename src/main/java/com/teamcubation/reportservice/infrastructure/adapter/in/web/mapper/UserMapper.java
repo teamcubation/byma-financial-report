@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper;
 
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
@@ -8,6 +9,9 @@ import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response
 public class UserMapper {
 
     public static User userRequestToUser(UserRequest userRequest) {
+        if (userRequest == null) {
+            throw new UserNotFoundException();
+        }
         return User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
@@ -17,6 +21,9 @@ public class UserMapper {
     }
 
     public static UserResponse userToUserResponse(User user) {
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
         return UserResponse.builder()
                 .name(user.getName())
                 .email(user.getEmail())
