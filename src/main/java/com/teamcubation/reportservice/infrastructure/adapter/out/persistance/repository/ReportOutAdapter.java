@@ -7,8 +7,10 @@ import java.util.List;
 
 public class ReportOutAdapter implements ReportOutPort {
 
+    private MongoDbRepository mongoDbRepository;
+
     @Override
-    public List<Report> findById() {
+    public List<Report> findByUserId(long id) {
         return List.of();
     }
 

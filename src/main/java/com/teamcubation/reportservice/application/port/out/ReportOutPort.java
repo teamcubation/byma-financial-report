@@ -5,6 +5,6 @@ import com.teamcubation.reportservice.domain.model.Report;
 import java.util.List;
 
 public interface ReportOutPort {
-    List<Report> findById();
+    List<Report> findByUserId(long id);
     List<Report> getAll();
 }
