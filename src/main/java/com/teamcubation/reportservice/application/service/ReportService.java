@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.application.service;
 
+import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.ConnectionBond;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.ConnectionStock;
 import lombok.extern.slf4j.Slf4j;
@@ -10,15 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class ReportService {
-    private final ConnectionBond connectionBond;
-    private final ConnectionStock connectionStock;
+    private final ConnectionOutPort connectionOutPort;
 
-
-    public String getAllBonds() {
-        return connectionBond.getAllBonds();
+    public String getAll() {
+        return connectionOutPort.getAll();
     }
 
-    public String getAllStocks() {
-        return connectionStock.getAllStocks();
-    }
 }

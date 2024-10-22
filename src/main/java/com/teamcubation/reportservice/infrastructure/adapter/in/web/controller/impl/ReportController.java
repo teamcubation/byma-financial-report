@@ -16,15 +16,7 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping()
-    public ResponseEntity<?> testConnectionBond() {
-
-        log.info("testConnectionBond");
-        return ResponseEntity.ok().body(reportService.getAllBonds());
-    }
-
-    @GetMapping("/stocks")
-    public ResponseEntity<?> testConnectionStock() {
-        log.info("testConnectionStock");
-        return ResponseEntity.ok().body(reportService.getAllStocks());
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok().body(reportService.getAll());
     }
 }
