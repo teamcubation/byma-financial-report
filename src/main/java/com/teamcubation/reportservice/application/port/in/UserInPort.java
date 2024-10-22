@@ -8,11 +8,11 @@ public interface UserInPort {
 
     User create(User user);
 
-    User findById(long id);
+    User findById(long id) throws Exception;
 
-    User update(long id, User user);
+    User update(long id, User user) throws Exception;
 
-    void delete(long id);
+    void delete(long id) throws Exception;
 
     List<User> getAll();
 

@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity;
+package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user;
 
 
 import com.teamcubation.reportservice.domain.model.user.UserRole;
@@ -22,19 +22,16 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Username is mandatory")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+
     private String username;
 
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Email should be valid")
+
     private String email;
 
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+
     private String password;
 
-    @NotNull(message = "Role is mandatory")
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 

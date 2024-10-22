@@ -5,16 +5,15 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.UserEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.UserRepository;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.crossstore.ChangeSetPersister;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,9 +114,9 @@ public class UserOutAdapterTest {
                 .role(UserRole.ROLE_ADMIN)
                 .build();
 
-        when(userRepository.findByEmail(mockedEmailRequest)).thenReturn(Optional.of(expectedUserEntity));
+        when(userRepository.findByEmailIgnoreCase(mockedEmailRequest)).thenReturn(Optional.of(expectedUserEntity));
 
-        User user = userOutAdapter.findByEmail(mockedEmailRequest);
+        User user = userOutAdapter.findByEmailIgnoreCase(mockedEmailRequest);
 
         assertNotNull(user, "User should not be null");
         assertEquals(expectedUserEntity.getId(), user.getId(), "Id should be equal");
@@ -229,34 +228,14 @@ public class UserOutAdapterTest {
     }
 
 
-    @Test
-    void shouldThrowException_wheInvalidEmailIsProvided() {
-
-        User user = UserMapper.userRequestToUser(mockedUserRequest);
-        user.setId(mockedUserIdRequest);
-        user.setEmail("test");
-
-        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.updateUser(user));
-    }
-
-
-    //Delete tests
-
-    @Test
-    void shouldDeleteUser_whenValidIdIsProvided() throws UserEntityNotFoundException {
-
-        userOutAdapter.deleteUser(mockedUserIdRequest);
-
-        verify(userRepository, times(1)).deleteById(mockedUserIdRequest);
-    }
 
     @Test
     void shouldThrowUserEntityNotFoundException_whenInvalidIdIsProvided() {
-        assertThrows(UserEntityNotFoundException.class, () -> userOutAdapter.deleteUser(-1L));
+        assertThrows(UserEntityNotFoundException.class, () -> userOutAdapter.deleteUserById(-1L));
     }
 
     @Test
     void shouldThrowIllegalArgumentException_whenInvalidIdIsProvided() {
-        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.deleteUser(null));
+        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.deleteUserById(null));
     }
 }

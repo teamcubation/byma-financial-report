@@ -3,7 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ma
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.UserEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 
 public class UserPersistenceMapper {
 
@@ -25,6 +25,7 @@ public class UserPersistenceMapper {
             throw new UserNotFoundException();
         }
         return UserEntity.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
