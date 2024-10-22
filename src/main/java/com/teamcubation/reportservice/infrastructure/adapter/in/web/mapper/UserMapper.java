@@ -13,7 +13,7 @@ public class UserMapper {
             throw new UserNotFoundException();
         }
         return User.builder()
-                .name(userRequest.getName())
+                .username(userRequest.getUsername())
                 .email(userRequest.getEmail())
                 .password(userRequest.getPassword())
                 .role(UserRole.valueOf(userRequest.getRole()))
@@ -25,7 +25,7 @@ public class UserMapper {
             throw new UserNotFoundException();
         }
         return UserResponse.builder()
-                .name(user.getName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole())

@@ -16,10 +16,26 @@ public class MockController {
         return "mock";
     }
 
-    @GetMapping("/auth")
-    public String authenticated() {
+    @GetMapping("/user")
+    public String user() {
+        return "Only for users with role USER";
+    }
 
-        UserAuthenticated userAthenticated = (UserAuthenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @GetMapping("/admin")
+    public String admin() {
+        return "Only for users with role ADMIN";
+    }
+
+    @GetMapping("/auth")
+    public String authenticated() throws Exception {
+
+        UserAuthenticated userAthenticated = null;
+        try {
+            userAthenticated = (UserAuthenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            //TODO pensar custom exception para este caso
+            throw new Exception(e);
+        }
         return "Bienvenido " + userAthenticated.getUsername();
     }
 }

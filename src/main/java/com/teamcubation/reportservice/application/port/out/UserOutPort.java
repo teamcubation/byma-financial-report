@@ -1,21 +1,31 @@
 package com.teamcubation.reportservice.application.port.out;
 
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserOutPort {
 
-    Optional<User> findById(long id);
 
-    User save(User user);
+    User registerUser(User user);
 
-    void deleteById(long id);
+    User findByEmailIgnoreCase(String email) throws Exception;
 
-    boolean existsByEmailIgnoreCase(String email);
+    User findByUsername(String username) throws Exception;
+
+    User findById(Long id) throws Exception;
 
     List<User> getAll();
 
+    User updateUser(User user);
+
+    void deleteUserById(Long id) throws UserEntityNotFoundException;
+
+    boolean existsByEmailIgnoreCase(String email);
+
     boolean existsByNameIgnoreCase(String name);
+
+
+
 }

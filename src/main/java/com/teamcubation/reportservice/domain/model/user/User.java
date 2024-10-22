@@ -11,10 +11,14 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User {
 
-    private long id;
-    private String name;
+    private Long id;
+
+    private String username;
+
     private String email;
+
     private String password;
+
     private UserRole role;
 
 }

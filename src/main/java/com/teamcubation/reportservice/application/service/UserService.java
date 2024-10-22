@@ -21,18 +21,18 @@ public class UserService implements UserInPort {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException();
         }
-        return userOutPort.save(user);
+        return userOutPort.registerUser(user);
     }
 
     @Override
-    public User findById(long id) throws UserNotFoundException {
-        return userOutPort.findById(id).orElseThrow(UserNotFoundException::new);
+    public User findById(long id) throws Exception {
+        return userOutPort.findById(id);
     }
 
     @Override
-    public User update(long id, User user) throws UserNotFoundException, UserDuplicateException {
+    public User update(long id, User user) throws Exception {
 
-        User existingUser = userOutPort.findById(id).orElseThrow(UserNotFoundException::new);
+        User existingUser = userOutPort.findById(id);
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
                 throw new UserDuplicateException();
@@ -40,11 +40,11 @@ public class UserService implements UserInPort {
             existingUser.setEmail(user.getEmail());
         }
 
-        if (user.getName() != null) {
-            if (!existingUser.getName().equals(user.getName()) && userOutPort.existsByNameIgnoreCase(user.getName())) {
+        if (user.getUsername() != null) {
+            if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
                 throw new UserDuplicateException();
             }
-            existingUser.setName(user.getName());
+            existingUser.setUsername(user.getUsername());
         }
 
         if (user.getRole() != null) {
@@ -55,15 +55,15 @@ public class UserService implements UserInPort {
             existingUser.setPassword(user.getPassword());
         }
 
-        return userOutPort.save(user);
+        return userOutPort.registerUser(user);
     }
 
     @Override
-    public void delete(long id) throws UserNotFoundException {
-        if (userOutPort.findById(id).isEmpty()) {
+    public void delete(long id) throws Exception {
+        if (userOutPort.findById(id) == null) {
             throw new UserNotFoundException();
         }
-        userOutPort.deleteById(id);
+        userOutPort.deleteUserById(id);
     }
 
     @Override
