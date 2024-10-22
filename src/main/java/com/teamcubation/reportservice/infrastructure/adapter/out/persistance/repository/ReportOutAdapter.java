@@ -9,7 +9,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportOutAdapter implements ReportOutPort {
 
-    private MongoDbRepository mongoDbRepository;
+    private ReportRepository reportRepository;
 
     @Override
     public List<Report> findByUserId(long id) {
