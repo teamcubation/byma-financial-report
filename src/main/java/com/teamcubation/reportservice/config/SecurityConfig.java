@@ -21,6 +21,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
                         .requestMatchers("/mock/public/**").permitAll()
+                        .requestMatchers("/mock/user/**").hasRole("USER")
+                        .requestMatchers("/mock/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))  // Deshabilitar protección de frame para H2

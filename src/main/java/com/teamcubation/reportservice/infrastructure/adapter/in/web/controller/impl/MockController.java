@@ -16,6 +16,16 @@ public class MockController {
         return "mock";
     }
 
+    @GetMapping("/user")
+    public String user() {
+        return "Only for users with role USER";
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "Only for users with role ADMIN";
+    }
+
     @GetMapping("/auth")
     public String authenticated() throws Exception {
 
