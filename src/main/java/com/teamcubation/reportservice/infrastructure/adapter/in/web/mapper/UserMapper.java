@@ -9,7 +9,7 @@ public class UserMapper {
 
     public static User userRequestToUser(UserRequest userRequest) {
         return User.builder()
-                .name(userRequest.getName())
+                .username(userRequest.getUsername())
                 .email(userRequest.getEmail())
                 .password(userRequest.getPassword())
                 .role(UserRole.valueOf(userRequest.getRole()))
@@ -18,7 +18,7 @@ public class UserMapper {
 
     public static UserResponse userToUserResponse(User user) {
         return UserResponse.builder()
-                .name(user.getName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole())

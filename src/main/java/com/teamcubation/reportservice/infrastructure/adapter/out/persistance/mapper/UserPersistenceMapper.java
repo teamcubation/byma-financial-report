@@ -8,19 +8,20 @@ public class UserPersistenceMapper {
 
     public static User userEntityToUser(UserEntity userEntity) {
         return User.builder()
-                .name(userEntity.getName())
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
                 .email(userEntity.getEmail())
                 .password(userEntity.getPassword())
-                .role(UserRole.valueOf(userEntity.getRole()))
+                .role(UserRole.valueOf(userEntity.getRole().toString()))
                 .build();
     }
 
     public static UserEntity userToUserEntity(User user) {
         return UserEntity.builder()
-                .name(user.getName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .role(user.getRole().name())
+                .role(user.getRole())
                 .build();
     }
 
