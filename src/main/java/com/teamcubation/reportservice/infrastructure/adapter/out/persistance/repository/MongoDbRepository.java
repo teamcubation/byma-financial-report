@@ -3,5 +3,5 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.re
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface MongoDbRepository extends MongoRepository<ReportEntity, Long> {
+public interface MongoDbRepository extends MongoRepository<ReportEntity, String> {
 }

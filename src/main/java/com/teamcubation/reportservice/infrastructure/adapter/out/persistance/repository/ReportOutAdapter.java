@@ -2,9 +2,11 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.re
 
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public class ReportOutAdapter implements ReportOutPort {
 
     private MongoDbRepository mongoDbRepository;
