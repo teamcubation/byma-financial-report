@@ -19,8 +19,9 @@ public class UserOutAdapter implements MockedUserOutPort {
     private  UserRepository userRepository;
 
     @Override
-    public User registerUser(@Valid User user) {
+    public User registerUser(User user) {
 
+        validateNullParams(user);
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
 
         return UserPersistenceMapper.userEntityToUser(saved);
@@ -62,9 +63,9 @@ public class UserOutAdapter implements MockedUserOutPort {
     }
 
     @Override
-    public User updateUser(@Valid User user) {
+    public User updateUser(User user) {
 
-        validateParams(user);
+        validateNullParams(user);
 
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         UserEntity updated = userRepository.save(userEntity);
@@ -73,13 +74,13 @@ public class UserOutAdapter implements MockedUserOutPort {
 
     @Override
     public void deleteUser(Long id) throws UserEntityNotFoundException {
-        validateParams(id);
+        validateNullParams(id);
         validateUserExist(id);
 
         userRepository.deleteById(id);
     }
 
-    private static void validateParams(Object ...params) {
+    private static void validateNullParams(Object ...params) {
         if (params == null || params.length == 0) {
             throw new IllegalArgumentException("Invalid arguments");
         }

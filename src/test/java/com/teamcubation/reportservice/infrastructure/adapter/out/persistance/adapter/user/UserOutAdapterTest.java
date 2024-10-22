@@ -236,7 +236,7 @@ public class UserOutAdapterTest {
         user.setId(mockedUserIdRequest);
         user.setEmail("test");
 
-        userOutAdapter.updateUser(user);
+        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.updateUser(user));
     }
 
 
