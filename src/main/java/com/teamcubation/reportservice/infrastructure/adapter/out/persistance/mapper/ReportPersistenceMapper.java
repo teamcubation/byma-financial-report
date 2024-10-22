@@ -4,7 +4,6 @@ import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.util.validation.PersistenceValidation;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReportPersistenceMapper {
@@ -18,7 +17,6 @@ public class ReportPersistenceMapper {
                 .creationDate(reportEntity.getCreationDate())
                 .downloadUrlPdf(reportEntity.getDownloadUrlPdf())
                 .downloadUrlCsv(reportEntity.getDownloadUrlCsv())
-                .typeOfFinancialAsset(reportEntity.getTypeOfFinancialAsset())
                 .content(reportEntity.getContent())
                 .build();
 
@@ -33,7 +31,6 @@ public class ReportPersistenceMapper {
                 .creationDate(LocalDateTime.now())
                 .downloadUrlPdf(report.getDownloadUrlPdf())
                 .downloadUrlCsv(report.getDownloadUrlCsv())
-                .typeOfFinancialAsset(report.getTypeOfFinancialAsset())
                 .content(report.getContent())
                 .build();
 

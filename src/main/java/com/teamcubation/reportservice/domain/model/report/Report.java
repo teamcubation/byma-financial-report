@@ -21,6 +21,5 @@ public class Report {
     private String downloadUrlPdf;
     private String downloadUrlCsv;
     private LocalDateTime creationDate;
-    private String typeOfFinancialAsset;
     private String content;
 }
