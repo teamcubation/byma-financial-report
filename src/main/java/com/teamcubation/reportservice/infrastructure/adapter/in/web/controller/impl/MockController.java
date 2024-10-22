@@ -17,9 +17,15 @@ public class MockController {
     }
 
     @GetMapping("/auth")
-    public String authenticated() {
+    public String authenticated() throws Exception {
 
-        UserAuthenticated userAthenticated = (UserAuthenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserAuthenticated userAthenticated = null;
+        try {
+            userAthenticated = (UserAuthenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            //TODO pensar custom exception para este caso
+            throw new Exception(e);
+        }
         return "Bienvenido " + userAthenticated.getUsername();
     }
 }
