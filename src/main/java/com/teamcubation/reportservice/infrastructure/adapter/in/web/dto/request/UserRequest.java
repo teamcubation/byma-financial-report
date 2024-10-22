@@ -29,8 +29,4 @@ public class UserRequest {
     @NotBlank(message = ROLE_CANNOT_BE_EMPTY)
     private String role;
 
-
-
-
-
 }

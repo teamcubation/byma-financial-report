@@ -6,19 +6,29 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class UserMapper {
 
     public static User userRequestToUser(UserRequest userRequest) {
         if (userRequest == null) {
             throw new UserNotFoundException();
         }
-        return User.builder()
+
+        User user = User.builder()
                 .username(userRequest.getUsername())
                 .email(userRequest.getEmail())
                 .password(userRequest.getPassword())
-                .role(UserRole.valueOf(userRequest.getRole()))
                 .build();
+
+        if (userRequest.getRole() != null) {
+            user.setRole(mapRole(userRequest.getRole()));
+        }
+
+        return user;
     }
+
 
     public static UserResponse userToUserResponse(User user) {
         if (user == null) {
@@ -28,8 +38,25 @@ public class UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .role(user.getRole())
+                .role(user.getRole().name())
                 .build();
+    }
+
+    private static UserRole mapRole(String role) {
+        try {
+            return UserRole.valueOf(role.toUpperCase());  // Convert to uppercase and map to Enum
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+    }
+
+    public static List<UserResponse> usersToUserResponses(List<User> users) {
+        if (users == null) {
+            throw new UserNotFoundException();
+        }
+        return users.stream()
+                .map(UserMapper::userToUserResponse)
+                .collect(Collectors.toList());
     }
 
 }

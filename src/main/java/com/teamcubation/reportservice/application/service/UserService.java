@@ -21,6 +21,11 @@ public class UserService implements UserInPort {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException();
         }
+
+        if (userOutPort.existsByNameIgnoreCase(user.getUsername())) {
+            throw new UserDuplicateException();
+        }
+
         return userOutPort.registerUser(user);
     }
 
@@ -55,7 +60,7 @@ public class UserService implements UserInPort {
             existingUser.setPassword(user.getPassword());
         }
 
-        return userOutPort.registerUser(user);
+        return userOutPort.updateUser(existingUser);
     }
 
     @Override
