@@ -61,21 +61,21 @@ public class UserOutAdapterTest {
                         .username("Juan")
                         .email("test@gmail.com")
                         .password("password")
-                        .role(UserRole.ROLE_ADMIN)
+                        .role(UserRole.ADMIN)
                         .build(),
                 UserEntity.builder()
                         .id(2L)
                         .username("Pepe")
                         .email("test2@gmail.com")
                         .password("password")
-                        .role(UserRole.ROLE_ADMIN)
+                        .role(UserRole.ADMIN)
                         .build(),
                 UserEntity.builder()
                         .id(3L)
                         .username("Jhon")
                         .email("test3@gmail.com")
                         .password("password")
-                        .role(UserRole.ROLE_ADMIN)
+                        .role(UserRole.ADMIN)
                         .build()
         );
 
@@ -88,7 +88,7 @@ public class UserOutAdapterTest {
                 .username("username")
                 .email("test@gmail.com")
                 .password("password")
-                .role(UserRole.ROLE_ADMIN)
+                .role(UserRole.ADMIN)
                 .build();
         User userFromRequest = UserMapper.userRequestToUser(mockedUserRequest);
 
@@ -111,7 +111,7 @@ public class UserOutAdapterTest {
                 .username("username")
                 .email("test@gmail.com")
                 .password("password")
-                .role(UserRole.ROLE_ADMIN)
+                .role(UserRole.ADMIN)
                 .build();
 
         when(userRepository.findByEmailIgnoreCase(mockedEmailRequest)).thenReturn(Optional.of(expectedUserEntity));
@@ -133,7 +133,7 @@ public class UserOutAdapterTest {
                 .username("username")
                 .email("test@gmail.com")
                 .password("password")
-                .role(UserRole.ROLE_ADMIN)
+                .role(UserRole.ADMIN)
                 .build();
 
         when(userRepository.findByUsername(mockedUsernameRequest)).thenReturn(Optional.of(expectedUserEntity));
@@ -155,7 +155,7 @@ public class UserOutAdapterTest {
                 .username("username")
                 .email("test@gmail.com")
                 .password("password")
-                .role(UserRole.ROLE_ADMIN)
+                .role(UserRole.ADMIN)
                 .build();
 
         when(userRepository.findById(mockedUserIdRequest)).thenReturn(Optional.of(expectedUserEntity));
@@ -198,7 +198,7 @@ public class UserOutAdapterTest {
                 .username("username")
                 .email("test@gmail.com")
                 .password("password")
-                .role(UserRole.ROLE_ADMIN)
+                .role(UserRole.ADMIN)
                 .build();
 
 

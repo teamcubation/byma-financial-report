@@ -1,14 +1,19 @@
 package com.teamcubation.reportservice.application.service;
 
 import com.teamcubation.reportservice.domain.model.user.UserAuthenticated;
+import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -34,8 +39,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     .username(username)
                     .email("admin@teamcubation.com")
                     .password(encodedPassword)
+                    .role(UserRole.ADMIN)
                     .build();
-            return new UserAuthenticated(user);
+
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+
+            return new UserAuthenticated(user, authorities);
         } else {
             throw new UsernameNotFoundException("User not found");
         }

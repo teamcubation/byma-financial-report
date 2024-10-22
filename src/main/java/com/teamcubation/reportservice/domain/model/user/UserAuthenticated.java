@@ -11,11 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 public class UserAuthenticated implements UserDetails {
 
-    private final UserEntity user;
+    private UserEntity user;
+    private List<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return authorities;
     }
 
     @Override
