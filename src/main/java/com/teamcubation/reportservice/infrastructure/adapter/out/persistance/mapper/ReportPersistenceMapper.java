@@ -2,6 +2,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ma
 
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.util.validation.PersistenceValidation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 public class ReportPersistenceMapper {
 
     public static Report reportEntityToReportModel(ReportEntity reportEntity){
-        if (reportEntity == null) throw new RuntimeException();
+        PersistenceValidation.validateObjetNotNull(reportEntity);
         return Report.builder()
                 .id(reportEntity.getId())
                 .title(reportEntity.getTitle())
@@ -24,7 +25,7 @@ public class ReportPersistenceMapper {
     }
 
     public static ReportEntity reportModelToReportEntity(Report report){
-        if (report == null) throw new RuntimeException();
+        PersistenceValidation.validateObjetNotNull(report);
         return ReportEntity.builder()
                 .id(report.getId())
                 .title(report.getTitle())
@@ -37,5 +38,4 @@ public class ReportPersistenceMapper {
                 .build();
 
     }
-
 }
