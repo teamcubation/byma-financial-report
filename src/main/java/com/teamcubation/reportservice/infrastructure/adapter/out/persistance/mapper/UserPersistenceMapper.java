@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper;
 
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.UserEntity;
@@ -7,6 +8,9 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ent
 public class UserPersistenceMapper {
 
     public static User userEntityToUser(UserEntity userEntity) {
+        if (userEntity == null) {
+            throw new UserNotFoundException();
+        }
         return User.builder()
                 .name(userEntity.getName())
                 .email(userEntity.getEmail())
@@ -16,6 +20,9 @@ public class UserPersistenceMapper {
     }
 
     public static UserEntity userToUserEntity(User user) {
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
         return UserEntity.builder()
                 .name(user.getName())
                 .email(user.getEmail())
