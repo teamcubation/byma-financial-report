@@ -11,6 +11,7 @@ public class AuthService implements AuthInPort {
         return "";
     }
 
+    //TODO Implementar reglas de negocio para el registro. Similar al del crud de users
     @Override
     public User register(User user) {
         return null;
