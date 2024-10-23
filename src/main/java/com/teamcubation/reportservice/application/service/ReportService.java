@@ -18,6 +18,14 @@ import java.util.List;
 public class ReportService implements ReportInPort {
     private final ConnectionOutPort connectionOutPort;
 
+    public byte[] generateFile(String typeFile) throws IOException {
+        if (typeFile.equals("csv")) {
+            return generateCsv();
+        }
+
+        return generatePdf();
+    }
+
     public byte[] generatePdf() throws IOException {
         List<BonoDto> allBonds = connectionOutPort.getAllBonds();
         List<StockDto> allStocks = connectionOutPort.getAllStocks();

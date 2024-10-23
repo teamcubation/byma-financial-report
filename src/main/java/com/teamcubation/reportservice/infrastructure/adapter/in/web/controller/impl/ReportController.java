@@ -1,6 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl;
 
-import com.teamcubation.reportservice.application.service.ReportService;
+import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,23 +14,14 @@ import java.io.IOException;
 @RequestMapping(("/report"))
 public class ReportController {
     @Autowired
-    private ReportService reportService;
+    private ReportInPort reportService;
 
-    @GetMapping("/generatepdf")
-    public ResponseEntity<byte[]> downloadFilePdf() throws IOException {
-        byte[] fileContent = reportService.generatePdf();
-
-        return ResponseEntity.ok()
-                .headers(this.generateHeader("application/pdf", "report.pdf"))
-                .body(fileContent);
-    }
-
-    @GetMapping("/download-file")
-    public ResponseEntity<byte[]> downloadFileCsv() throws IOException {
-        byte[] fileContent = reportService.generateCsv();
+    @GetMapping("/generateReport")
+    public ResponseEntity<byte[]> downloadFile(@RequestParam(defaultValue = "pdf") String typeFile) throws IOException {
+        byte[] fileContent = reportService.generateFile(typeFile);
 
         return ResponseEntity.ok()
-                .headers(this.generateHeader("application/csv", "report.csv"))
+                .headers(this.generateHeader("application/" + typeFile, "report." + typeFile))
                 .body(fileContent);
     }
 
