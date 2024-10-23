@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.application.service;
+package com.teamcubation.reportservice.application.service.generatorfile;
 import com.opencsv.CSVWriter;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;

@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class ReportEntity {
     @Id
     private String id;
-    @Indexed(unique = true)
     private String title;
+    @Indexed(unique = true)
     private String userEmail;
     private String downloadUrlPdf;
     private String downloadUrlCsv;
