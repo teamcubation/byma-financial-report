@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    //public final AuthenticationProvider authenticationProvider;
+    public final AuthenticationProvider authenticationProvider;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -30,8 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/mock/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(authenticationProvider)
+              .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+               .authenticationProvider(authenticationProvider)
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))  // Deshabilitar protección de frame para H2
                 .httpBasic(Customizer.withDefaults()) // Habilitar autenticación basada en HTTP, User y Password en application.properties. En futuras tareas se va a  configurar para que sea en base a los users de la DB
                 .build();
