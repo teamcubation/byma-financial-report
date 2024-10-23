@@ -26,8 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        //MockUserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        //return new UserAuthenticated(user);
 
         // Hardcodeamos el usuario "admin" con la contraseña "test1234"
         if ("admin".equals(username)) {
@@ -45,8 +43,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
 
             return new UserAuthenticated(user, authorities);
-        } else {
-            throw new UsernameNotFoundException("User not found");
         }
+
+        UserEntity userFromDb = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
+
+        return new UserAuthenticated(userFromDb, authoritiesFromDb);
+
     }
 }

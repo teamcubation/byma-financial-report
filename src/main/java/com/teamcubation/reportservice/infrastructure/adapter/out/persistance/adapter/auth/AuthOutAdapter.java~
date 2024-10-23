@@ -14,12 +14,12 @@ public class AuthOutAdapter implements AuthOutPort {
 
     //TODO modificar los parametros en la interfaz
     @Override
-    public String login(User user) {
+    public String login(String email, String password) {
         return "";
     }
 
     @Override
-    public User register(User user) {
+    public User register(String email, String password) {
         return null;
     }
 }
