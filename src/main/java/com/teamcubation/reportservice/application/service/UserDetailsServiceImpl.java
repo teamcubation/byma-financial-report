@@ -28,14 +28,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 
         // Hardcodeamos el usuario "admin" con la contraseña "test1234"
-        if ("admin".equals(username)) {
+        if ("admin@gmail.com".equals(username)) {
             // Aquí estamos encriptando la contraseña con BCrypt
             String encodedPassword = passwordEncoder.encode("test1234");
 
             UserEntity user = UserEntity.builder()
                     .id(1L)
-                    .username(username)
-                    .email("admin@teamcubation.com")
+                    .username("admin")
+                    .email(username)
                     .password(encodedPassword)
                     .role(UserRole.ADMIN)
                     .build();
@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return new UserAuthenticated(user, authorities);
         }
 
-        UserEntity userFromDb = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
 
         return new UserAuthenticated(userFromDb, authoritiesFromDb);

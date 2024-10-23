@@ -7,4 +7,8 @@ public interface AuthOutPort {
     String login(User user);
 
     User register(User user);
+
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByUserNameIgnoreCase(String username);
 }

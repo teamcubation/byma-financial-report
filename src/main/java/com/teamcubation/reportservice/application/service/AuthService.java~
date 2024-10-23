@@ -23,11 +23,11 @@ public class AuthService implements AuthInPort {
     public User register(User user) {
 
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new UserDuplicateException("Email already exists");
+            new UserDuplicateException("Email already exists");
         }
 
         if (authOutPort.existsByUserNameIgnoreCase(user.getUsername())) {
-            throw new UserDuplicateException("Username already exists");
+            new UserDuplicateException("Username already exists");
         }
 
         return authOutPort.register(user);

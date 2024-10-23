@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 public class AuthOutAdapter implements AuthOutPort {
 
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     //TODO modificar los parametros en la interfaz
     @Override
@@ -31,5 +31,15 @@ public class AuthOutAdapter implements AuthOutPort {
 
         UserEntity saved = userRepository.save(userEntity);
         return UserPersistenceMapper.userEntityToUser(saved);
+    }
+
+    @Override
+    public boolean existsByEmailIgnoreCase(String email) {
+        return userRepository.existsByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public boolean existsByUserNameIgnoreCase(String username) {
+        return userRepository.existsByUsernameIgnoreCase(username);
     }
 }
