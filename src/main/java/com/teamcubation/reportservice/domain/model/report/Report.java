@@ -7,14 +7,19 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Report {
-    private LocalDateTime dateTime;
+
+    private String id;
     private String title;
-    private List<FilterReport> filters;
-    private String format;
+    private String userEmail;
+    private String downloadUrlPdf;
+    private String downloadUrlCsv;
+    private LocalDateTime creationDate;
+    private String content;
 }
