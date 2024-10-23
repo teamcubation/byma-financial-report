@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    public final AuthenticationProvider authenticationProvider;
+    //public final AuthenticationProvider authenticationProvider;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
