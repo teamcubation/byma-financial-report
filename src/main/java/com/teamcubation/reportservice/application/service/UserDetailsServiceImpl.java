@@ -5,6 +5,8 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,12 +18,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    @Lazy
     private PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
