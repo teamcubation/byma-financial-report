@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserOutAdapter implements UserOutPort {
 
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public User registerUser(User user) {
@@ -91,22 +91,22 @@ public class UserOutAdapter implements UserOutPort {
 
     @Override
     public boolean existsByEmailIgnoreCase(String email) {
-        return false;
+        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
     public boolean existsByNameIgnoreCase(String name) {
-        return false;
+        return userRepository.existsByUsernameIgnoreCase(name);
     }
 
-    private static void validateNullParams(Object ...params) {
-        if(PersistanceValidation.isNull(params)) {
+    private static void validateNullParams(Object... params) {
+        if (PersistanceValidation.isNull(params)) {
             throw new IllegalArgumentException("Params cannot be null");
         }
     }
 
     private void validateUserExist(Long id) throws UserEntityNotFoundException {
-        if(userIsNotFoundById(id)) {
+        if (userIsNotFoundById(id)) {
             throw new UserEntityNotFoundException("User not found");
         }
     }

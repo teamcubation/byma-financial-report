@@ -16,6 +16,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return ResponseEntity.badRequest().body(getValidationErrorsMap(ex));
+    }
+
     @ExceptionHandler(MockCustomException.class)
     public ResponseEntity<?> handleDuplicatedStockException(MockCustomException e, HttpServletRequest request) {
 

@@ -5,6 +5,9 @@ import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class UserPersistenceMapper {
 
     public static User userEntityToUser(UserEntity userEntity) {
@@ -31,6 +34,15 @@ public class UserPersistenceMapper {
                 .password(user.getPassword())
                 .role(user.getRole())
                 .build();
+    }
+
+    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) {
+        if (userEntities == null) {
+            throw new UserNotFoundException();
+        }
+        return userEntities.stream()
+                .map(UserPersistenceMapper::userEntityToUser)
+                .collect(Collectors.toList());
     }
 
 }
