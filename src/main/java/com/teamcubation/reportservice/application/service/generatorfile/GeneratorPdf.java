@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.application.service;
+package com.teamcubation.reportservice.application.service.generatorfile;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -22,11 +22,14 @@ public class GeneratorPdf {
         PdfWriter.getInstance(document, baos);
 
         document.open();
-        document.add(new Paragraph("Bonos"));
-        document.add(new Paragraph(bonds.toString()));
-        document.add(new Paragraph("Acciones"));
-        document.add(new Paragraph(stocks.toString()));
-
+        if (bonds != null) {
+            document.add(new Paragraph("Bonos"));
+            document.add(new Paragraph(bonds.toString()));
+        }
+        if (stocks != null) {
+            document.add(new Paragraph("Acciones"));
+            document.add(new Paragraph(stocks.toString()));
+        }
         document.close();
 
         return baos.toByteArray();

@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.externalapi;
 
+import com.teamcubation.reportservice.config.ConfigService;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ConnectionStock {
     private RestTemplate restTemplateStock;
 
     public List<StockDto> getAllStocks() {
-        String url = "https://stock-service-8pyw.onrender.com/stock/";
+        String url = ConfigService.STOCKS_SERVICE_URL;
         ResponseEntity<StockDto[]> response = restTemplateStock.getForEntity(url, StockDto[].class);
         log.info(Arrays.toString(response.getBody()));
         return Arrays.asList(response.getBody());
