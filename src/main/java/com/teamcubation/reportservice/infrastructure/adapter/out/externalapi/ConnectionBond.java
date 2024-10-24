@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.externalapi;
 
+import com.teamcubation.reportservice.config.ConfigService;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ConnectionBond {
     private RestTemplate restTemplateBond;
 
     public List<BonoDto> getAllBonds() {
-        String url = "https://bonds-service-latest.onrender.com/api/bonds";
+        String url = ConfigService.BONDS_SERVICE_URL;
         ResponseEntity<BonoDto[]> response = restTemplateBond.getForEntity(url, BonoDto[].class);
         log.info(Arrays.toString(response.getBody()));
         return Arrays.asList(response.getBody());
