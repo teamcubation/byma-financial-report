@@ -87,21 +87,21 @@ public class ReportService implements ReportInPort {
         throw new IllegalArgumentException("Instrument type not supported");
     }
 
-    @Cacheable(value = "reportsByUserEmail", key = "#email")
+    @Cacheable(value = "reportsCache", key = "#email")
     public List<Report> findByUserEmail(String email) {
         return reportOutPort.findByUserEmail(email).stream()
                 .map(ReportPersistenceMapper::reportEntityToReportModel)
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "allReports")
+    @Cacheable(value = "reportsCache")
     public List<Report> getAllReports() {
         return reportOutPort.getAll().stream()
                 .map(ReportPersistenceMapper::reportEntityToReportModel)
                 .collect(Collectors.toList());
     }
 
-    @CachePut(value = "reports", key = "#report.userEmail")
+    @CachePut(value = "reportsCache", key = "#report.userEmail")
     public Report save(Report report) {
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }

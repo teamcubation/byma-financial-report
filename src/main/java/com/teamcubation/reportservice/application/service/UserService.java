@@ -4,9 +4,10 @@ import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
-import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.domain.model.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class UserService implements UserInPort {
 
     private final UserOutPort userOutPort;
 
+    @CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User create(User user) throws UserDuplicateException {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
@@ -36,6 +38,7 @@ public class UserService implements UserInPort {
         return userOutPort.findById(id);
     }
 
+    @CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User update(long id, User user) throws Exception {
 
@@ -65,6 +68,7 @@ public class UserService implements UserInPort {
         return userOutPort.updateUser(existingUser);
     }
 
+    @CacheEvict(value = "usersCache", key = "#id")
     @Override
     public void delete(long id) throws Exception {
         if (userOutPort.findById(id) == null) {
@@ -73,6 +77,7 @@ public class UserService implements UserInPort {
         userOutPort.deleteUserById(id);
     }
 
+    @Cacheable(value = "usersCache")
     @Override
     public List<User> getAll() {
         return userOutPort.getAll();
