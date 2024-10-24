@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.domain.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,5 @@ public class UserService implements UserInPort {
     public List<User> getAll() {
         return userOutPort.getAll();
     }
-
 
 }
