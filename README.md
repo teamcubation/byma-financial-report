@@ -1,68 +1,118 @@
-# byma-financial-report
+# Authentication and Authorization API - Postman Collection
 
-# Report Service API
+This API provides functionality for user authentication and authorization, with role-based access control using JWT. The collection can be used to test different endpoints related to public and protected resources, and user roles.
 
-Este documento proporciona una guía para autenticarse y realizar pruebas de la API de Report Service utilizando Postman. La API incluye endpoints públicos y privados que requieren autenticación básica (username y password).
+## Prerequisites
 
-## Requisitos previos
+- **Admin Credentials**:  
+  By default, an admin user is available with the following credentials:
+    - **Email**: `admin@gmail.com`
+    - **Password**: `test@1234`
 
-1. Tener instalado [Postman](https://www.postman.com/downloads/).
-2. Clonar o descargar el archivo `.json` de la colección de Postman, que incluye las peticiones de prueba para la API.
-3. Asegurarse de que el servidor API está corriendo localmente en `http://localhost:8080`.
+  You can use these credentials to log in as an admin user via the `/login` endpoint.
 
-## Colección de Postman
+- **Password Encryption**:  
+  Passwords are stored hashed using the following code:
 
-La colección de Postman con los endpoints de la API está disponible en el siguiente enlace:
-
-[Report Service API Collection](./Report%20Service%20API.postman_collection.json)
-
-Puedes importar la colección directamente en Postman o usar el archivo `.json` que se encuentra en este repositorio.
+  ```java
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+      return new BCryptPasswordEncoder();
+  }
+  
+  @Override
+  public User register(User user) {
+      UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
+      userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+      UserEntity saved = userRepository.save(userEntity);
+      return UserPersistenceMapper.userEntityToUser(saved);
+  }
+  ```
 
 ## Endpoints
 
-### 1. Endpoint Público
+### Public and Private Resources
 
-Este endpoint no requiere autenticación. Puedes probarlo directamente en Postman.
+The collection contains several endpoints to test different levels of access (public, authenticated, user roles):
 
-- **Método**: `GET`
-- **URL**: `http://localhost:8080/mock/public`
-- **Autenticación**: No requerida
+1. **Public Endpoint**
+    - **URL**: `http://localhost:8080/mock/public`
+    - **Method**: `GET`
+    - **Authorization**: No authentication required
 
-### 2. Endpoint Privado
+2. **Private Endpoint (Authenticated)**
+    - **URL**: `http://localhost:8080/mock/auth`
+    - **Method**: `GET`
+    - **Authorization**: Basic authentication required (admin credentials)
 
-Este endpoint requiere autenticación básica con un nombre de usuario y contraseña.
+3. **Private Endpoint (Role: USER)**
+    - **URL**: `http://localhost:8080/mock/public/user`
+    - **Method**: `GET`
+    - **Authorization**: Basic authentication required (admin credentials)
 
-- **Método**: `GET`
-- **URL**: `http://localhost:8080/mock/auth`
-- **Autenticación**: Basic Auth
-    - **Usuario**: `admin`
-    - **Contraseña**: `test1234`
+4. **Private Endpoint (Role: ADMIN)**
+    - **URL**: `http://localhost:8080/mock/auth`
+    - **Method**: `GET`
+    - **Authorization**: Basic authentication required (admin credentials)
 
-## Autenticación en Postman
+### User Authentication
 
-Para autenticarse en el endpoint privado, sigue estos pasos en Postman:
+These endpoints manage user registration and login, with support for role-based access.
 
-1. Abre Postman e importa la colección desde el archivo `.json` o el enlace proporcionado.
-2. En la colección, selecciona la solicitud llamada **"Endpoint privado"**.
-3. Haz clic en la pestaña **Authorization**.
-4. Selecciona **Basic Auth**.
-5. Introduce las credenciales:
-    - **Username**: `admin`
-    - **Password**: `test1234`
-6. Haz clic en **Send** para realizar la solicitud.
+1. **User Registration**
+    - **URL**: `http://localhost:8080/api/v1/auth/register`
+    - **Method**: `POST`
+    - **Body**:
+      ```json
+      {
+          "username": "username",
+          "email": "test@gmail.com",
+          "password": "test@1234"
+      }
+      ```
 
-Si la autenticación es exitosa, recibirás una respuesta del servidor. Si las credenciales son incorrectas, recibirás un error `401 Unauthorized`.
+2. **Login**
+    - **URL**: `http://localhost:8080/api/v1/auth/login`
+    - **Method**: `POST`
+    - **Body**:
+      ```json
+      {
+          "email": "test@gmail.com",
+          "password": "test@1234"
+      }
+      ```
 
-## Errores comunes
+3. **Admin Login**
+    - Same as regular login, using the admin credentials provided earlier.
 
-- **401 Unauthorized**: Ocurre cuando el nombre de usuario o contraseña son incorrectos. Verifica las credenciales y vuelve a intentarlo.
-- **404 Not Found**: Ocurre cuando el servidor API no está corriendo o la URL del endpoint no es válida.
+## Usage Instructions
 
-## Ejecutar la API localmente
+1. **Register as Admin**:  
+   Use the `/register` endpoint with the admin credentials to ensure the user is assigned the admin role.  
+   Example body:
+   ```json
+   {
+       "username": "admin",
+       "email": "admin@gmail.com",
+       "password": "test@1234"
+   }
+   ```
 
-Asegúrate de que la API está corriendo en `http://localhost:8080` antes de realizar las solicitudes en Postman. Puedes ejecutar la API localmente siguiendo las instrucciones del proyecto.
+2. **Login to Get JWT**:  
+   Use the `/login` endpoint to log in and receive a JWT token. This token must be included in the `Authorization` header as a Bearer token when accessing protected endpoints.
 
-## Contribuciones
+3. **Access Protected Endpoints**:  
+   After logging in and receiving a JWT token, use it to access private endpoints based on the assigned user roles (ADMIN or USER).
 
-Si deseas contribuir a este proyecto, crea un pull request o contacta con el equipo de desarrollo.
+## Postman Collection
 
+The provided Postman collection includes pre-configured requests for all the endpoints mentioned above, which can be used to test the API locally. Simply import the collection into Postman, and adjust the environment variables or URLs if necessary.
+
+### Importing the Collection
+
+1. Download the provided Postman JSON file.
+2. Open Postman and click on the "Import" button.
+3. Select the downloaded JSON file and import it.
+4. You can now test the API using the requests included in the collection.
+
+Make sure to adjust any parameters, headers, or authentication methods as needed based on your setup.
