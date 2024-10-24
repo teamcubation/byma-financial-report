@@ -30,6 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         //ahora se hardcodea el user admin en el registro del authService
 
+        //este llamado a userRepostory podria ser un call al servicio de autenticacion
         UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
 
