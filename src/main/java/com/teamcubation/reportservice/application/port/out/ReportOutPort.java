@@ -6,8 +6,8 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ent
 import java.util.List;
 
 public interface ReportOutPort {
-    List<Report> findByUserEmail(String email);
-    List<Report> getAll();
+    List<ReportEntity> findByUserEmail(String email);
+    List<ReportEntity> getAll();
     ReportEntity save(Report report);
 
 }
