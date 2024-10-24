@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.port.in.AuthInPort;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.LoginRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.RegisterRequestDTO;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.TokenResponseDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.AuthMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import jakarta.validation.Valid;
@@ -23,15 +24,20 @@ public class AuthController {
     private AuthInPort authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
-        return null;
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) throws Exception {
+
+        User user = AuthMapper.LoginRequestToUser(loginRequest);
+        String token = authService.login(user);
+        TokenResponseDTO response = TokenResponseDTO.builder().token(token).build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDTO registerRequest) {
+    public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) {
 
         User newUserFromRequest = AuthMapper.RegisterRequestToUser(registerRequest);
-        User registeredUser = authService.register(newUserFromRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(registeredUser));
+        String token = authService.register(newUserFromRequest);
+        TokenResponseDTO response = TokenResponseDTO.builder().token(token).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
