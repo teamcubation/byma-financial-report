@@ -5,6 +5,7 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,37 +19,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    @Lazy
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-
-        // Hardcodeamos el usuario "admin" con la contraseña "test1234"
-        if ("admin@gmail.com".equals(username)) {
-            // Aquí estamos encriptando la contraseña con BCrypt
-            String encodedPassword = passwordEncoder.encode("test1234");
-
-            UserEntity user = UserEntity.builder()
-                    .id(1L)
-                    .username("admin")
-                    .email(username)
-                    .password(encodedPassword)
-                    .role(UserRole.ADMIN)
-                    .build();
-
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
-
-            return new UserAuthenticated(user, authorities);
-        }
+        //ahora se hardcodea el user admin en el registro del authService
 
         UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));

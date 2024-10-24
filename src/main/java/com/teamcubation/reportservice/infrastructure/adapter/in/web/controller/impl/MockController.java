@@ -18,7 +18,7 @@ public class MockController {
 
     @GetMapping("/user")
     public String user() {
-        return "Only for users with role USER";
+        return "Only for users with role USER or ADMIN";
     }
 
     @GetMapping("/admin")

@@ -24,8 +24,12 @@ public class AuthController {
     private AuthInPort authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
-        return null;
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) throws Exception {
+
+        User user = AuthMapper.LoginRequestToUser(loginRequest);
+        String token = authService.login(user);
+        TokenResponseDTO response = TokenResponseDTO.builder().token(token).build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")

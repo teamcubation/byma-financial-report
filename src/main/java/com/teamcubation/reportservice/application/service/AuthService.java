@@ -2,8 +2,10 @@ package com.teamcubation.reportservice.application.service;
 
 import com.teamcubation.reportservice.application.port.in.AuthInPort;
 import com.teamcubation.reportservice.application.port.out.AuthOutPort;
+import com.teamcubation.reportservice.application.service.Jwt.JwtService;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.domain.model.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +41,10 @@ public class AuthService implements AuthInPort {
 
         if (authOutPort.existsByUserNameIgnoreCase(user.getUsername())) {
             throw new UserDuplicateException("Username already exists");
+        }
+        //Hardcodeamos el rol de admin
+        if (user.getEmail().equalsIgnoreCase("admin@gmail.com")) {
+            user.setRole(UserRole.ADMIN);
         }
         User createdUser = authOutPort.register(user);
         String token = jwtService.generateToken(createdUser);
