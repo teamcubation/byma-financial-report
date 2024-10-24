@@ -8,6 +8,7 @@ import com.teamcubation.reportservice.application.service.generatorfile.Generato
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,10 +38,10 @@ public class ReportService implements ReportInPort {
         } else
             throw new IllegalArgumentException("File type not supported");
 
-        reportOutPort.save(createReport(fileContent));
+        save(createReport(fileContent));
         return fileContent;
     }
-
+    
     private Report createReport(byte[] reportContent) {
         return Report.builder()
                 .id("2")
@@ -55,19 +57,49 @@ public class ReportService implements ReportInPort {
     public byte[] generatePdf(String typeInstrument) throws IOException {
         List<BonoDto> allBonds = connectionOutPort.getAllBonds();
         List<StockDto> allStocks = connectionOutPort.getAllStocks();
+        if (typeInstrument == null) {
+            return GeneratorPdf.generatePdfContent(allBonds, allStocks);
+        }
+        if (typeInstrument.equals("bonds")) {
+            return GeneratorPdf.generatePdfContent(allBonds, null);
+        }
+        if (typeInstrument.equals("stocks")) {
+            return GeneratorPdf.generatePdfContent(null, allStocks);
+        }
+        throw new IllegalArgumentException("Instrument type not supported");
 
-        return GeneratorPdf.generatePdfContent(allBonds, allStocks);
     }
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
         List<BonoDto> allBonds = connectionOutPort.getAllBonds();
         List<StockDto> allStocks = connectionOutPort.getAllStocks();
+        if (typeInstrument == null) {
+            return GeneratorCsv.generateCsv(allBonds, allStocks);
+        }
+        if (typeInstrument.equals("bonds")) {
+            return GeneratorCsv.generateCsv(allBonds, null);
+        }
+        if (typeInstrument.equals("stocks")) {
+            return GeneratorCsv.generateCsv(null, allStocks);
+        }
+        throw new IllegalArgumentException("Instrument type not supported");
+    }
 
-        return GeneratorCsv.generateCsv(allBonds, allStocks);
+    public List<Report> findByUserEmail(String email) {
+        log.info("Entro a la bdd - findByUserEmail");
+        return reportOutPort.findByUserEmail(email).stream()
+                .map(ReportPersistenceMapper::reportEntityToReportModel)
+                .collect(Collectors.toList());
     }
 
     public List<Report> getAllReports() {
-        return reportOutPort.getAll();
+        return reportOutPort.getAll().stream()
+                .map(ReportPersistenceMapper::reportEntityToReportModel)
+                .collect(Collectors.toList());
+    }
+
+    public Report save(Report report) {
+        return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }
 }
 
