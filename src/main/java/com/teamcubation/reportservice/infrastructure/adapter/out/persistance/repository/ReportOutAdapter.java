@@ -17,7 +17,7 @@ public class ReportOutAdapter implements ReportOutPort {
 
     private final ReportRepository reportRepository;
 
-    //@Cacheable(value = "reportsByUserEmail", key = "#email")
+    @Cacheable(value = "reportsByUserEmail", key = "#email")
     @Override
     public List<Report> findByUserEmail(String email) {
         return reportRepository.findByUserEmail(email).stream()
@@ -25,7 +25,7 @@ public class ReportOutAdapter implements ReportOutPort {
                 .collect(Collectors.toList());
     }
 
-    //@Cacheable(value = "allReports")
+    @Cacheable(value = "allReports")
     @Override
     public List<Report> getAll() {
         return reportRepository.findAll().stream()
@@ -33,7 +33,7 @@ public class ReportOutAdapter implements ReportOutPort {
                 .collect(Collectors.toList());
     }
 
-    //@CachePut(value = "reports", key = "#report.email")
+    @CachePut(value = "reports", key = "#report.email")
     public ReportEntity save(Report report) {
         return reportRepository.save(ReportPersistenceMapper.reportModelToReportEntity(report));
     }

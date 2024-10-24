@@ -34,6 +34,7 @@ public class ReportController {
 
         return headers;
     }
+
     @GetMapping("/getAll")
     public ResponseEntity<List<Report>> getAllReports(){
         return ResponseEntity.ok(reportService.getAllReports());
