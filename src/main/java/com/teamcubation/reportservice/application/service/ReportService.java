@@ -10,6 +10,8 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -85,21 +87,22 @@ public class ReportService implements ReportInPort {
         throw new IllegalArgumentException("Instrument type not supported");
     }
 
+    @Cacheable(value = "reportsCache", key = "#email")
     public List<Report> findByUserEmail(String email) {
-        log.info("Entro a la bdd - findByUserEmail");
         return reportOutPort.findByUserEmail(email).stream()
                 .map(ReportPersistenceMapper::reportEntityToReportModel)
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "reportsCache")
     public List<Report> getAllReports() {
         return reportOutPort.getAll().stream()
                 .map(ReportPersistenceMapper::reportEntityToReportModel)
                 .collect(Collectors.toList());
     }
 
+    @CachePut(value = "reportsCache", key = "#report.userEmail")
     public Report save(Report report) {
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }
 }
-
