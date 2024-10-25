@@ -5,6 +5,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -16,12 +17,11 @@ import java.util.List;
 @Component
 public class ConnectionBond {
     @Autowired
-    @Qualifier("restTemplateBond")
-    private RestTemplate restTemplateBond;
+    private ApiConsumer apiConsumer;
 
     public List<BonoDto> getAllBonds() {
         String url = ConfigService.BONDS_SERVICE_URL;
-        ResponseEntity<BonoDto[]> response = restTemplateBond.getForEntity(url, BonoDto[].class);
+        ResponseEntity<BonoDto[]> response = apiConsumer.restTemplate().getForEntity(url, BonoDto[].class);
         log.info(Arrays.toString(response.getBody()));
         return Arrays.asList(response.getBody());
     }
