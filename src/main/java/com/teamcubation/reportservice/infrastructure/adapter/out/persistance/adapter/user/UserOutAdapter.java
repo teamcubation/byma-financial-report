@@ -1,6 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
 
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
@@ -53,14 +54,14 @@ public class UserOutAdapter implements UserOutPort {
     }
 
     @Override
-    public User findById(Long id) throws Exception {
+    public User findById(Long id) throws UserNotFoundException {
 
         validateNullParams(id);
 
         //TODO implementar custom Exception
         UserEntity userById = userRepository
                 .findById(id)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userById);
     }
 

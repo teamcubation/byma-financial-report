@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.application.port.out;
 
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 
@@ -14,7 +15,7 @@ public interface UserOutPort {
 
     User findByUsername(String username) throws Exception;
 
-    User findById(Long id) throws Exception;
+    User findById(Long id) throws UserNotFoundException;
 
     List<User> getAll();
 
@@ -25,7 +26,4 @@ public interface UserOutPort {
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByNameIgnoreCase(String name);
-
-
-
 }

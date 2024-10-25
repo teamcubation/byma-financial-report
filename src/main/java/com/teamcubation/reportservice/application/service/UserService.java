@@ -34,11 +34,11 @@ public class UserService implements UserInPort {
     }
 
     @Override
-    public User findById(long id) throws Exception {
+    public User findById(long id) throws UserNotFoundException {
         return userOutPort.findById(id);
     }
 
-    @CachePut(value = "usersCache", key = "#user.id")
+    @CachePut(value = "usersCache", key = "#id")
     @Override
     public User update(long id, User user) throws Exception {
 
