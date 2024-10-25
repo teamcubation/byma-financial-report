@@ -40,7 +40,7 @@ public class UserService implements UserInPort {
 
     @CachePut(value = "usersCache", key = "#id")
     @Override
-    public User update(long id, User user) throws Exception {
+    public User update(long id, User user) throws UserDuplicateException {
 
         User existingUser = userOutPort.findById(id);
         if (user.getEmail() != null) {
