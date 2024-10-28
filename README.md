@@ -2,7 +2,8 @@
 
 ## Overview
 
-This API allows users to generate and manage various types of reports and export them in PDF format. The API offers
+This API allows users to generate and manage various types of reports and export them in PDF or CSV format. The API
+offers
 functionality to create, retrieve, and delete reports, as well as to download them in PDF. Additionally, the API
 supports authentication using JWT and enforces role-based access control for managing the reports.
 
@@ -26,6 +27,11 @@ supports authentication using JWT and enforces role-based access control for man
 - **Spring Data JPA** - Data access layer.
 - **iText (Optional)** - PDF generation library.
 - **JWT** - Authentication and authorization.
+- **Spring Security** - Security framework.
+- **Spring Web** - Web framework.
+- **Spring Boot Starter Test** - Unit testing tools.
+- **Spring Boot Starter Validation** - Validation tools.
+- **Spring Boot Starter Data JPA** - Data access tools.
 
 ## Prerequisites
 
@@ -48,8 +54,7 @@ supports authentication using JWT and enforces role-based access control for man
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/reporting-api.git
-cd reporting-api
+git clone https://github.com/teamcubation/byma-financial-report.git
 ```
 
 ### 2. Build the Project
@@ -66,54 +71,56 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-By default, the application runs on `http://localhost:8080`. You can access the API via this URL.
+By default, the application runs on `http://localhost:8000`. You can access the API via this URL.
 
 ### 4. Access Swagger UI
 
 Once the application is running, you can view the API documentation and interact with it through the Swagger UI:
 
 ```bash
-http://localhost:8080/swagger-ui/index.html
+http://localhost:8000/swagger-ui/index.html
 ```
+
+---
+
+# Important Notice 🚨
+
+**Before accessing most endpoints in this API, users must first generate an authentication token by calling an endpoint
+in the `AuthController`.**
+
+- For full access to all features, including those limited to administrators, it is recommended to generate a token with
+  `ADMIN` permissions.
+
+- The token will be required in the `Authorization` header (as `Bearer <token>`) for endpoints with restricted access.
+
+> **To generate a token with `ADMIN` permissions:**
+> Use the `POST /api/v1/auth/register` endpoint and log in with admin credentials.
+
+in de body:
+
+```json
+{
+  "username": "admin",
+  "email": "admin@gmail.com",
+  "password": "test@1234"
+}
+```
+
+  ---
 
 ### 5. Sample API Requests
 
 Here are some sample requests you can use to interact with the API via Postman:
 
-1. **Create a Report (POST /api/reports)**
+1. **Get a Report in PDF format (GET /report/generateReport?typeFile=pdf)**
 
-   ```json
-   {
-     "title": "Sales Report",
-     "description": "Monthly sales report for the team",
-     "parameters": {
-       "dateRange": "2023-09-01 to 2023-09-30",
-       "region": "North America"
-     }
-   }
-   ```
+`GET http://localhost:8000/report/generateReport?typeFile=pdf`
 
-2. **Get All Reports (GET /api/reports)**
+2. **Get a Report in CSV format (GET /report/generateReport?typeFile=csv)**
 
-   `GET http://localhost:8080/api/reports`
+`GET http://localhost:8000/report/generateReport?typeFile=csv`
 
-3. **Get Report by ID (GET /api/reports/{id})**
-
-   `GET http://localhost:8080/api/reports/1`
-
-4. **Delete Report (DELETE /api/reports/{id})**
-
-   `DELETE http://localhost:8080/api/reports/1`
-
-### 6. Export Report as PDF (GET /api/reports/{id}/pdf)
-
-This endpoint allows you to download a report as a PDF file.
-
-```bash
-GET http://localhost:8080/api/reports/1/pdf
-```
-
-### 7. Running Tests
+### 6. Running Tests
 
 To run unit tests and integration tests:
 
@@ -128,7 +135,7 @@ token in the `Authorization` header.
 
 ### Steps to authenticate:
 
-1. **Register a User (POST /api/auth/register)**
+1. **Register a User (POST /api/v1/auth/register)**
 
    ```json
    {
@@ -146,22 +153,11 @@ token in the `Authorization` header.
      "password": "password123"
    }
    ```
-
    The response will include a JWT token:
-
-   ```json
-   {
-     "token": "your-jwt-token-here"
-   }
-   ```
 
 3. **Use JWT for Authorization**
 
    Include the token in the `Authorization` header of subsequent requests:
-
-   ```bash
-   Authorization: Bearer your-jwt-token-here
-   ```
 
 ## Postman Collection
 
@@ -301,3 +297,189 @@ necessary.
 4. You can now test the API using the requests included in the collection.
 
 Make sure to adjust any parameters, headers, or authentication methods as needed based on your setup.
+
+Here’s the content in English and formatted in Markdown, with Postman request details for each endpoint:
+
+---
+
+# UserController
+
+The `UserController` handles basic CRUD operations for registered users in the system.
+
+### 1. Create User
+
+- **Endpoint:** `POST /api/users`
+- **Description:** Allows registering a new user.
+
+#### Request Body
+
+```json
+{
+  "username": "PEPE",
+  "email": "PEPE@example.com",
+  "password": "pepe123"
+}
+```
+
+#### Response
+
+- **Status:** `201 Created`
+- **Body:**
+  ```json
+   {
+   "username": "PEPE",
+   "email": "PEPE@example.com",
+   "password": "42342lkhsdfsdfsds", // hashed password
+   "role": "USER"
+   }
+  ```
+
+### 2. Get All Users
+
+- **Endpoint:** `GET /api/users`
+- **Description:** Returns a list of all users.
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+  [
+    {
+        "username": "admin",
+        "email": "admin@gmail.com",
+        "password": "$2a$10$BgpXcCu9ML8hNx.2bT2ob.WPx4u0fuCMQxFPQbNatbzxIqC1IRYZ6",
+        "role": "ADMIN"
+    },
+    {
+        "username": "PEPE",
+        "email": "pepe@gmail.com",
+        "password": "$2a$10$BgpXcCu9ML8hNx.2bT2ob.WPx4u0fuCMQxFPQbNatbzxIqC1IRYZ6",
+        "role": "USER"
+    }
+  ]
+  ```
+
+### 3. Get User by ID
+
+- **Endpoint:** `GET /api/users/{id}`
+- **Description:** Returns information of a specific user.
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+   {
+   "username": "admin",
+   "email": "admin@gmail.com",
+   "password": "$2a$10$BgpXcCu9ML8hNx.2bT2ob.WPx4u0fuCMQxFPQbNatbzxIqC1IRYZ6",
+   "role": "ADMIN"
+   }
+  ```
+
+### 4. Delete User
+
+- **Endpoint:** `DELETE /api/users/{id}`
+- **Description:** Deletes a user based on the specified ID.
+
+#### Response
+
+- **Status:** `204 No Content`
+
+### 5. Update User
+
+- **Endpoint:** `PUT /api/users/{id}`
+- **Description:** Updates the data of a specific user.
+
+#### Request Body
+
+```json
+{
+  "username": "newUsername",
+  "email": "newemail@example.com",
+  "password": "newPassword"
+}
+```
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "id": "123",
+    "username": "newUsername",
+    "email": "newemail@example.com"
+  }
+  ```
+
+---
+
+# MockController
+
+The `MockController` contains example endpoints that demonstrate user authentication and role-based access.
+
+### 1. Public Access
+
+- **Endpoint:** `GET /mock/public`
+- **Description:** An endpoint accessible to all users.
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "message": "mock"
+  }
+  ```
+
+### 2. User Access
+
+- **Endpoint:** `GET /mock/user`
+- **Description:** Accessible only to users with `USER` or `ADMIN` roles.
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "message": "Only for users with role USER or ADMIN"
+  }
+  ```
+
+### 3. Admin Access
+
+- **Endpoint:** `GET /mock/admin`
+- **Description:** Restricted to users with the `ADMIN` role.
+
+#### Response
+
+- **Status:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "message": "Only for users with role ADMIN"
+  }
+  ```
+
+### 4. Authenticated Access
+
+- **Endpoint:** `GET /mock/auth`
+- **Description:** Returns a welcome message to the authenticated user. Throws an exception if authentication fails.
+
+#### Response
+
+- **Status:** `200 OK` *(or appropriate error status if unauthorized)*
+- **Body:**
+  ```json
+  {
+    "message": "Welcome, authenticated user!"
+  }
+  ```
+
+---
+
+Let me know if there's anything more you'd like to add!
