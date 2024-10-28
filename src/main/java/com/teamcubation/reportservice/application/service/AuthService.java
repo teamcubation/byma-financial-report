@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.port.in.AuthInPort;
 import com.teamcubation.reportservice.application.port.out.AuthOutPort;
 import com.teamcubation.reportservice.application.service.Jwt.JwtService;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import lombok.AllArgsConstructor;
@@ -33,7 +34,7 @@ public class AuthService implements AuthInPort {
 
     //TODO Implementar reglas de negocio para el registro. Similar al del crud de users
     @Override
-    public String register(User user) {
+    public String register(User user) throws UserDuplicateException, UserNotFoundException {
 
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException("Email already exists");

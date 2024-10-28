@@ -1,6 +1,8 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl;
 
 import com.teamcubation.reportservice.application.port.in.AuthInPort;
+import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.LoginRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.RegisterRequestDTO;
@@ -33,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) {
+    public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) throws UserDuplicateException, UserNotFoundException {
 
         User newUserFromRequest = AuthMapper.RegisterRequestToUser(registerRequest);
         String token = authService.register(newUserFromRequest);

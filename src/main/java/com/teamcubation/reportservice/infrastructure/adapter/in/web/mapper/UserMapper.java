@@ -6,12 +6,13 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    public static User userRequestToUser(UserRequest userRequest) {
+    public static User userRequestToUser(UserRequest userRequest) throws UserNotFoundException {
         if (userRequest == null) {
             throw new UserNotFoundException();
         }
@@ -30,7 +31,7 @@ public class UserMapper {
     }
 
 
-    public static UserResponse userToUserResponse(User user) {
+    public static UserResponse userToUserResponse(User user) throws UserNotFoundException {
         if (user == null) {
             throw new UserNotFoundException();
         }
@@ -50,13 +51,18 @@ public class UserMapper {
         }
     }
 
-    public static List<UserResponse> usersToUserResponses(List<User> users) {
+    public static List<UserResponse> usersToUserResponses(List<User> users) throws UserNotFoundException {
         if (users == null) {
             throw new UserNotFoundException();
         }
-        return users.stream()
-                .map(UserMapper::userToUserResponse)
-                .collect(Collectors.toList());
+
+        List<UserResponse> usersResponses = new ArrayList<>();
+
+        for (User user : users) {
+            usersResponses.add(userToUserResponse(user));
+        }
+
+        return usersResponses;
     }
 
 }

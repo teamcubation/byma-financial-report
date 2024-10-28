@@ -1,5 +1,7 @@
 package com.teamcubation.reportservice.exceptionHandler;
 
+import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.MockCustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
@@ -29,6 +32,21 @@ public class GlobalExceptionHandler {
                 .body(this.createErrorMessage(e, request, HttpStatus.CONFLICT));
     }
 
+    @ExceptionHandler(UserDuplicateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleUserDuplicateException(HttpServletRequest req, Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(createErrorMessage(e, req, HttpStatus.CONFLICT));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleUserNotFoundException(HttpServletRequest req, Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(createErrorMessage(e, req, HttpStatus.CONFLICT));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(Exception e, HttpServletRequest request) {

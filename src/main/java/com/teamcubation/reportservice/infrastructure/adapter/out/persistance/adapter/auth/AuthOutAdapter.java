@@ -1,6 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.auth;
 
 import com.teamcubation.reportservice.application.port.out.AuthOutPort;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
@@ -24,7 +25,7 @@ public class AuthOutAdapter implements AuthOutPort {
     }
 
     @Override
-    public User register(User user) {
+    public User register(User user) throws UserNotFoundException {
 
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));

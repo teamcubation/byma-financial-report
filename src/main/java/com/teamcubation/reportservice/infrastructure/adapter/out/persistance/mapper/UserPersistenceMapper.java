@@ -5,12 +5,13 @@ import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserPersistenceMapper {
 
-    public static User userEntityToUser(UserEntity userEntity) {
+    public static User userEntityToUser(UserEntity userEntity) throws UserNotFoundException {
         if (userEntity == null) {
             throw new UserNotFoundException();
         }
@@ -23,7 +24,7 @@ public class UserPersistenceMapper {
                 .build();
     }
 
-    public static UserEntity userToUserEntity(User user) {
+    public static UserEntity userToUserEntity(User user) throws UserNotFoundException {
         if (user == null) {
             throw new UserNotFoundException();
         }
@@ -36,13 +37,18 @@ public class UserPersistenceMapper {
                 .build();
     }
 
-    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) {
+    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserNotFoundException {
         if (userEntities == null) {
             throw new UserNotFoundException();
         }
-        return userEntities.stream()
-                .map(UserPersistenceMapper::userEntityToUser)
-                .collect(Collectors.toList());
+
+        List<User> users = new ArrayList<>();
+
+        for (UserEntity userEntity : userEntities) {
+            users.add(UserPersistenceMapper.userEntityToUser(userEntity));
+        }
+
+        return users;
     }
 
 }

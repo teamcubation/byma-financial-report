@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
 
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,7 +84,7 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    public void shouldRegisterUser_whenValidUserIsProvided_thenReturnPersistedUser() {
+    public void shouldRegisterUser_whenValidUserIsProvided_thenReturnPersistedUser() throws UserNotFoundException {
         UserEntity expectedUserEntity = UserEntity.builder()
                 .id(1L)
                 .username("username")
@@ -171,11 +173,13 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() {
+    void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() throws UserNotFoundException {
 
-        List<User> expectedUsers = mockedUserEntitiesFromDb.stream()
-                .map(UserPersistenceMapper::userEntityToUser)
-                .toList();
+        List<User> expectedUsers = new ArrayList<>();
+
+        for (UserEntity userEntity : mockedUserEntitiesFromDb) {
+            expectedUsers.add(UserPersistenceMapper.userEntityToUser(userEntity));
+        }
 
         when(userRepository.findAll()).thenReturn(mockedUserEntitiesFromDb);
 
@@ -192,7 +196,7 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    void shouldUpdateUser_whenValidUserRequestIsProvided_thenReturnPersistedUser() {
+    void shouldUpdateUser_whenValidUserRequestIsProvided_thenReturnPersistedUser() throws UserNotFoundException {
         UserEntity expectedUserEntity = UserEntity.builder()
                 .id(1L)
                 .username("username")
