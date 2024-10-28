@@ -3,11 +3,15 @@ import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
 
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
+import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorCsv;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -17,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,7 @@ public class ReportService implements ReportInPort {
     private final ConnectionOutPort connectionOutPort;
 
     private final ReportOutPort reportOutPort;
+    private final UserOutPort userOutPort;
 
     public byte[] generateFile(String typeFile, String typeInstrument) throws IOException {
         byte[] fileContent;
@@ -38,7 +44,7 @@ public class ReportService implements ReportInPort {
             fileContent = generatePdf(typeInstrument);
             downloadUrl = "/reports/download/pdf";
         } else
-            throw new IllegalArgumentException("File type not supported");
+            throw new InvalidTypeFyleException("File type not supported");
 
         save(createReport(fileContent));
         return fileContent;
@@ -57,19 +63,16 @@ public class ReportService implements ReportInPort {
     }
 
     public byte[] generatePdf(String typeInstrument) throws IOException {
-        List<BonoDto> allBonds = connectionOutPort.getAllBonds();
-        List<StockDto> allStocks = connectionOutPort.getAllStocks();
         if (typeInstrument == null) {
-            return GeneratorPdf.generatePdfContent(allBonds, allStocks);
+            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
         }
         if (typeInstrument.equals("bonds")) {
-            return GeneratorPdf.generatePdfContent(allBonds, null);
+            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
         }
         if (typeInstrument.equals("stocks")) {
-            return GeneratorPdf.generatePdfContent(null, allStocks);
+            return GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
         }
-        throw new IllegalArgumentException("Instrument type not supported");
-
+        throw new InvalidInstrumentException("Instrument type not supported");
     }
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
@@ -84,7 +87,7 @@ public class ReportService implements ReportInPort {
         if (typeInstrument.equals("stocks")) {
             return GeneratorCsv.generateCsv(null, allStocks);
         }
-        throw new IllegalArgumentException("Instrument type not supported");
+        throw new InvalidInstrumentException("Instrument type not supported");
     }
 
     @Cacheable(value = "reportsCache", key = "#email")
