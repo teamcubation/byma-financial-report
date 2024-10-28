@@ -4,13 +4,11 @@ import com.teamcubation.reportservice.application.service.Jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,10 +25,10 @@ public class SecurityConfig {
                 .csrf(crs -> crs.disable())
                 .authorizeHttpRequests(authRequest -> authRequest
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/api/users/public/{id}").hasRole("USER")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/report/reportHistory").hasRole("ADMIN")
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
-                        .requestMatchers("/mock/public/**").permitAll()
-                        .requestMatchers("/mock/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/mock/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

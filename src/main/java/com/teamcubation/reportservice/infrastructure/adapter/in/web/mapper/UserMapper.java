@@ -4,7 +4,9 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
+import io.jsonwebtoken.lang.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +41,16 @@ public class UserMapper {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole().name())
+                .build();
+    }
+
+    public static User userUpdateRequestDTOToUser(UserUpdateRequestDTO userUpdateRequestDTO) {
+        Assert.notNull(userUpdateRequestDTO, "UserUpdateRequestDTO cannot be null");
+        return User.builder()
+                .username(userUpdateRequestDTO.getUsername())
+                .email(userUpdateRequestDTO.getEmail())
+                .password(userUpdateRequestDTO.getPassword())
+                .role(UserRole.USER)
                 .build();
     }
 

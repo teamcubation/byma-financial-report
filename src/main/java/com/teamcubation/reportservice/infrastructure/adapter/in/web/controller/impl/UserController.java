@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.
 import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import jakarta.validation.Valid;
@@ -47,6 +48,13 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws Exception {
         User user = UserMapper.userRequestToUser(userRequest);
+        return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.update(id, user)));
+    }
+
+    @PutMapping("public/{id}")
+    public ResponseEntity<UserResponse> updateRegularUser(@PathVariable long id, @RequestBody UserUpdateRequestDTO userRequest) throws Exception {
+        User user = UserMapper.userUpdateRequestDTOToUser(userRequest);
+        user.setId(id);
         return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.update(id, user)));
     }
 

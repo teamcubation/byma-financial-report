@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserService implements UserInPort {
 
     private final UserOutPort userOutPort;
+    private final PasswordEncoder passwordEncoder;
 
     @CachePut(value = "usersCache", key = "#user.id")
     @Override
@@ -29,6 +31,8 @@ public class UserService implements UserInPort {
         if (userOutPort.existsByNameIgnoreCase(user.getUsername())) {
             throw new UserDuplicateException();
         }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userOutPort.registerUser(user);
     }
@@ -64,6 +68,8 @@ public class UserService implements UserInPort {
         if (user.getPassword() != null) {
             existingUser.setPassword(user.getPassword());
         }
+
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userOutPort.updateUser(existingUser);
     }
