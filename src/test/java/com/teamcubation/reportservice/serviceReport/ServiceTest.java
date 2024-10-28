@@ -2,7 +2,6 @@ package com.teamcubation.reportservice.serviceReport;
 
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
-import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.ReportService;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorCsv;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
@@ -32,6 +31,24 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 public class ServiceTest {
+    public static final byte[] BYTE_ARRAY_RESULT = {1, 2, 2, 3, 4, 4};
+    public static final String TEST_GMAIL = "test@gmail";
+    public static final String INVALID = "invalid";
+    public static final String BONDS = "bonds";
+    public static final String STOCKS = "stocks";
+    public static final String CSV = "csv";
+    public static final String PDF = "pdf";
+    public static final String URLCSV = "urlcsv";
+    public static final String URLPDF = "urlpdf";
+    public static final String REPORT_A = "ReportA";
+    public static final String ID_1 = "1";
+    public static final String REPORT_B = "ReportB";
+    public static final String ID_2 = "2";
+    public static final double PRICE_NUMBER_10 = 10.0;
+    public static final double INTEREST_RATE_NUMBER_10 = 10.0;
+    public static final String BOND_TEST_NAME = "bond test";
+    public static final double DIVIDEND_NUMBER_10 = 10.0;
+    public static final String STOCK_TEST_NAME = "stock test";
     @InjectMocks
     private ReportService reportService;
 
@@ -49,10 +66,10 @@ public class ServiceTest {
         List <StockDto> stocks = new ArrayList<>();
         StockDto stock = new StockDto();
         stock.setCreationDate(LocalDate.now());
-        stock.setId(1L);
-        stock.setName("test");
-        stock.setDividend(10.0);
-        stock.setPrice(10.0);
+        stock.setId(Long.parseLong(ID_1));
+        stock.setName(STOCK_TEST_NAME);
+        stock.setDividend(DIVIDEND_NUMBER_10);
+        stock.setPrice(PRICE_NUMBER_10);
         stocks.add(stock);
         return stocks;
     }
@@ -60,18 +77,40 @@ public class ServiceTest {
         List <BonoDto> bonds = new ArrayList<>();
         BonoDto bono = new BonoDto();
         bono.setCreationDate(LocalDate.now());
-        bono.setId(1L);
-        bono.setName("test");
-        bono.setInterestRate(10.0);
-        bono.setPrice(10.0);
+        bono.setId(Long.parseLong(ID_1));
+        bono.setName(BOND_TEST_NAME);
+        bono.setInterestRate(INTEREST_RATE_NUMBER_10);
+        bono.setPrice(PRICE_NUMBER_10);
         bonds.add(bono);
         return bonds;
+    }
+    private static Report mockReportB() {
+        Report reportB = new Report();
+        reportB.setId(ID_2);
+        reportB.setTitle(REPORT_B);
+        reportB.setUserEmail(TEST_GMAIL);
+        reportB.setCreationDate(LocalDateTime.now());
+        reportB.setDownloadUrlPdf(URLPDF);
+        reportB.setDownloadUrlCsv(URLCSV);
+        reportB.setContent(new byte[]{});
+        return reportB;
+    }
+    private static Report mockReportA() {
+        Report reportA = new Report();
+        reportA.setId(ID_1);
+        reportA.setTitle(REPORT_A);
+        reportA.setUserEmail(TEST_GMAIL);
+        reportA.setCreationDate(LocalDateTime.now());
+        reportA.setDownloadUrlPdf(URLPDF);
+        reportA.setDownloadUrlCsv(URLCSV);
+        reportA.setContent(new byte[]{});
+        return reportA;
     }
     @Test
     void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException {
         byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
-        String typeFile = "pdf";
-        String typeInstrument = "stocks";
+        String typeFile = PDF;
+        String typeInstrument = STOCKS;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
@@ -83,8 +122,8 @@ public class ServiceTest {
     }
     @Test
     void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException {
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
-        String typeFile = "csv";
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
+        String typeFile = CSV;
         String typeInstrument = null;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
@@ -98,15 +137,15 @@ public class ServiceTest {
     }
     @Test
     void whenGenerateFileWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeFile = "invalid";
-        String typeInstrument = "stocks";
+        String typeFile = INVALID;
+        String typeInstrument = STOCKS;
         assertThrows(InvalidTypeFyleException.class, () -> reportService.generateFile(typeFile, typeInstrument));
     }
 
     @Test
     void whenGeneratePdfWithStocksParams_thenReturnListOfStocksTest() throws IOException {
-        String typeInstrument = "stocks";
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        String typeInstrument = STOCKS;
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
@@ -117,8 +156,8 @@ public class ServiceTest {
     }
     @Test
     void whenGeneratePdfWithBondsParams_thenReturnListOfBondsTest() throws IOException {
-        String typeInstrument = "bonds";
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        String typeInstrument = BONDS;
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
@@ -130,7 +169,7 @@ public class ServiceTest {
     @Test
     void generatePdfWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
         String typeInstrument = null;
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
@@ -142,13 +181,13 @@ public class ServiceTest {
     }
     @Test
     void whenGeneratePdfWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeInstrument = "invalid";
+        String typeInstrument = INVALID;
         assertThrows(InvalidInstrumentException.class, () -> reportService.generatePdf(typeInstrument));
     }
     @Test
     void whenGenerateCsvWithStocksParams_thenReturnListOfStocksTest() throws IOException {
-        String typeInstrument = "stocks";
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        String typeInstrument = STOCKS;
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
@@ -159,8 +198,8 @@ public class ServiceTest {
     }
     @Test
     void whenGenerateCsvWithBondsParams_thenReturnListOfBondsTest() throws IOException {
-        String typeInstrument = "bonds";
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        String typeInstrument = BONDS;
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
@@ -172,7 +211,7 @@ public class ServiceTest {
     @Test
     void whenGenerateCsvWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
         String typeInstrument = null;
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
+        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
@@ -184,12 +223,12 @@ public class ServiceTest {
     }
     @Test
     void whenGenerateCsvWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeInstrument = "invalid";
+        String typeInstrument = INVALID;
         assertThrows(InvalidInstrumentException.class, () -> reportService.generateCsv(typeInstrument));
     }
 
     @Test
-    void whenGetAllReports_returnEmptyListTest() {
+    void whenGetAllReports_returnNoDataReportTest() {
         List<ReportEntity> reportList = new ArrayList<>();
         when(reportOutPort.getAll()).thenReturn(reportList);
         List<Report> result = reportService.getAllReports();
@@ -199,25 +238,10 @@ public class ServiceTest {
 
     @Test
     void whenGetAllReports_return2ReportsTest() {
-
-        Report reportA = new Report();
-        reportA.setId("1");
-        reportA.setTitle("Report A");
-        reportA.setUserEmail("test@gmail");
-        reportA.setCreationDate(LocalDateTime.now());
-        reportA.setDownloadUrlPdf("urlpdf");
-        reportA.setDownloadUrlCsv("urlcsv");
-        reportA.setContent(new byte[]{});
+        Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
-        Report reportB = new Report();
-        reportB.setId("2");
-        reportB.setTitle("Report B");
-        reportB.setUserEmail("test@gmail");
-        reportB.setCreationDate(LocalDateTime.now());
-        reportB.setDownloadUrlPdf("urlpdf");
-        reportB.setDownloadUrlCsv("urlcsv");
-        reportB.setContent(new byte[]{});
+        Report reportB = mockReportB();
         reportOutPort.save(reportB);
 
         List<ReportEntity> reportList = new ArrayList<>();
@@ -227,33 +251,22 @@ public class ServiceTest {
         List<Report> result = reportService.getAllReports();
         assertEquals(result.size(), reportList.size());
     }
+
+
+
     @Test
-    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest() throws Exception{
-        Report reportA = new Report();
-        reportA.setId("1");
-        reportA.setTitle("Report A");
-        reportA.setUserEmail("test@gmail");
-        reportA.setCreationDate(LocalDateTime.now());
-        reportA.setDownloadUrlPdf("urlpdf");
-        reportA.setDownloadUrlCsv("urlcsv");
-        reportA.setContent(new byte[]{});
+    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest(){
+        Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
-        Report reportB = new Report();
-        reportB.setId("2");
-        reportB.setTitle("Report B");
-        reportB.setUserEmail("test@gmail");
-        reportB.setCreationDate(LocalDateTime.now());
-        reportB.setDownloadUrlPdf("urlpdf");
-        reportB.setDownloadUrlCsv("urlcsv");
-        reportB.setContent(new byte[]{});
+        Report reportB = mockReportB();
         reportOutPort.save(reportB);
 
         List<ReportEntity> reportList = new ArrayList<>();
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportA));
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportB));
-        when(reportOutPort.findByUserEmail("test@gmail")).thenReturn(reportList);
-        List<Report> result = reportService.findByUserEmail("test@gmail");
+        when(reportOutPort.findByUserEmail(TEST_GMAIL)).thenReturn(reportList);
+        List<Report> result = reportService.findByUserEmail(TEST_GMAIL);
         assertEquals(result.size(), reportList.size());
     }
 }
