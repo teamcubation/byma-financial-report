@@ -1,6 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
 
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
@@ -8,6 +9,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ent
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class UserOutAdapter implements UserOutPort {
     private UserRepository userRepository;
 
     @Override
-    public User registerUser(User user) {
+    public User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException {
 
         validateNullParams(user);
 
@@ -30,49 +32,55 @@ public class UserOutAdapter implements UserOutPort {
     }
 
     @Override
-    public User findByEmailIgnoreCase(String email) throws Exception {
+    public User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException {
 
         validateNullParams(email);
         //TODO implementar custom Exception
         UserEntity userByEmail = userRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByEmail);
     }
 
     @Override
-    public User findByUsername(String username) throws Exception {
+    public User findByUsername(String username) throws UserNotFoundException, UserEntityNotFoundException {
         //TODO implementar custom Exception
 
         validateNullParams(username);
 
         UserEntity userByUsername = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByUsername);
     }
 
     @Override
-    public User findById(Long id) throws Exception {
+    public User findById(Long id) throws UserNotFoundException, UserEntityNotFoundException {
 
         validateNullParams(id);
 
         //TODO implementar custom Exception
         UserEntity userById = userRepository
                 .findById(id)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userById);
     }
 
     @Override
     public List<User> getAll() {
         return userRepository.findAll().stream()
-                .map(UserPersistenceMapper::userEntityToUser)
+                .map(userEntity -> {
+                    try {
+                        return UserPersistenceMapper.userEntityToUser(userEntity);
+                    } catch (UserNotFoundException e) {
+                        throw new RuntimeException("Failed to convert UserEntity to User",e);
+                    }
+                })
                 .toList();
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException {
 
         validateNullParams(user);
 

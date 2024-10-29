@@ -1,5 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
 
+import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
@@ -82,7 +84,7 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    public void shouldRegisterUser_whenValidUserIsProvided_thenReturnPersistedUser() {
+    public void shouldRegisterUser_whenValidUserIsProvided_thenReturnPersistedUser() throws UserEntityNotFoundException, UserNotFoundException, InvalidUserModel {
         UserEntity expectedUserEntity = UserEntity.builder()
                 .id(1L)
                 .username("username")
@@ -90,7 +92,7 @@ public class UserOutAdapterTest {
                 .password("password")
                 .role(UserRole.ADMIN)
                 .build();
-        User userFromRequest = UserMapper.userRequestToUser(mockedUserRequest);
+        User userFromRequest = UserMapper.userRequestToUser(null, mockedUserRequest);
 
         when(userRepository.save(UserPersistenceMapper.userToUserEntity(userFromRequest))).thenReturn(expectedUserEntity);
 
@@ -174,7 +176,13 @@ public class UserOutAdapterTest {
     void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() {
 
         List<User> expectedUsers = mockedUserEntitiesFromDb.stream()
-                .map(UserPersistenceMapper::userEntityToUser)
+                .map(userEntity -> {
+                    try{
+                        return UserPersistenceMapper.userEntityToUser(userEntity);
+                    } catch (UserNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
 
         when(userRepository.findAll()).thenReturn(mockedUserEntitiesFromDb);
@@ -192,7 +200,7 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    void shouldUpdateUser_whenValidUserRequestIsProvided_thenReturnPersistedUser() {
+    void shouldUpdateUser_whenValidUserRequestIsProvided_thenReturnPersistedUser() throws UserEntityNotFoundException, UserNotFoundException, InvalidUserModel {
         UserEntity expectedUserEntity = UserEntity.builder()
                 .id(1L)
                 .username("username")
@@ -203,7 +211,7 @@ public class UserOutAdapterTest {
 
 
 
-        User userFromRequest = UserMapper.userRequestToUser(mockedUserRequest);
+        User userFromRequest = UserMapper.userRequestToUser(null, mockedUserRequest);
         userFromRequest.setId(mockedUserIdRequest);
 
         when(userRepository.save(UserPersistenceMapper.userToUserEntity(userFromRequest))).thenReturn(expectedUserEntity);
