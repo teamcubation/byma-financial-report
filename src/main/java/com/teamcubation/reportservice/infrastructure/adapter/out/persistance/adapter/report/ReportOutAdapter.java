@@ -1,9 +1,10 @@
-package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository;
+package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.report;
 
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -33,5 +34,11 @@ public class ReportOutAdapter implements ReportOutPort {
     public ReportEntity save(Report report) {
         log.info("Entro a la bdd - save");
         return reportRepository.save(ReportPersistenceMapper.reportModelToReportEntity(report));
+    }
+
+    @Override
+    public ReportEntity findById(String id) {
+        log.info("Entro a la bdd - findById");
+        return reportRepository.findById(id).orElseThrow();
     }
 }

@@ -44,4 +44,19 @@ public class ReportController implements ApiReport {
     public ResponseEntity<List<Report>> getAllReports() {
         return ResponseEntity.ok(reportService.getAllReports());
     }
+
+    @GetMapping("/reportHistoryByEmail")
+    public ResponseEntity<List<Report>> getReportsByEmail() {
+        List<Report> reports = reportService.findByUserEmail();
+        return ResponseEntity.ok(reports);
+    }
+
+    @GetMapping("/downloadReport/{id}")
+    public ResponseEntity<byte[]> downloadExistingReport(@PathVariable String id, @RequestParam String typeFile) throws IOException {
+        byte[] fileContent = reportService.downloadFile(id);
+
+        return ResponseEntity.ok()
+                .headers(this.generateHeader("application/" + typeFile, "report." + typeFile))
+                .body(fileContent);
+    }
 }
