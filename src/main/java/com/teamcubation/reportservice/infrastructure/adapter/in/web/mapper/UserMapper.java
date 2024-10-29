@@ -9,6 +9,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.validation.ControllerValidator;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,15 +67,11 @@ public class UserMapper {
 
     public static List<UserResponse> usersToUserResponses(List<User> users) throws InvalidUserModel {
         validateParams(users);
-        return users.stream()
-                .map(user -> {
-                    try {
-                        return userToUserResponse(user);
-                    } catch (InvalidUserModel e) {
-                        throw new RuntimeException("Failed to convert User to UserResponse", e);
-                    }
-                })
-                .collect(Collectors.toList());
+        List<UserResponse> userResponses = new ArrayList<>();
+        for(User user : users) {
+            userResponses.add(userToUserResponse(user));
+        }
+        return userResponses;
     }
 
     private static void validateParams(Object ...params) throws InvalidUserModel {

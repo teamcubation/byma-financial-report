@@ -38,7 +38,7 @@ public class UserController implements ApiUser {
 
     @Override
     @GetMapping()
-    public ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel {
+    public ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel, UserNotFoundException {
         return ResponseEntity.ok(UserMapper.usersToUserResponses(userInPort.getAll()));
     }
 

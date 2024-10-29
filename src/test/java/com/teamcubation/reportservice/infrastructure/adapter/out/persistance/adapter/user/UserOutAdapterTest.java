@@ -173,7 +173,7 @@ public class UserOutAdapterTest {
     }
 
     @Test
-    void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() {
+    void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() throws UserNotFoundException {
 
         List<User> expectedUsers = mockedUserEntitiesFromDb.stream()
                 .map(userEntity -> {

@@ -30,7 +30,7 @@ public interface ApiUser {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel;
+    ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel, UserNotFoundException;
 
     @Operation(summary = "Get a user by ID")
     @ApiResponses(value = {

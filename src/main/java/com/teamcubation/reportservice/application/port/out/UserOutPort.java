@@ -17,7 +17,7 @@ public interface UserOutPort {
 
     User findById(Long id) throws UserNotFoundException, UserEntityNotFoundException;
 
-    List<User> getAll();
+    List<User> getAll() throws UserNotFoundException;
 
     User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException;
 

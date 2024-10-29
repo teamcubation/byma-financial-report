@@ -86,7 +86,7 @@ public class UserService implements UserInPort {
 
     @Cacheable(value = "usersCache")
     @Override
-    public List<User> getAll() {
+    public List<User> getAll() throws UserNotFoundException {
         return userOutPort.getAll();
     }
 

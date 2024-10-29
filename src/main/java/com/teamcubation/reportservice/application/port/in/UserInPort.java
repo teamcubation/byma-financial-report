@@ -17,6 +17,6 @@ public interface UserInPort {
 
     void delete(long id) throws UserNotFoundException, UserEntityNotFoundException;
 
-    List<User> getAll();
+    List<User> getAll() throws UserNotFoundException;
 
 }

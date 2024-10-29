@@ -8,6 +8,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ada
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,19 +40,15 @@ public class UserPersistenceMapper {
                 .build();
     }
 
-    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserEntityNotFoundException {
+    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserEntityNotFoundException, UserNotFoundException {
+        List<User> users = new ArrayList<>();
         if (userEntities == null) {
             throw new UserEntityNotFoundException("User entities cannot be null");
         }
-        return userEntities.stream()
-                .map(userEntity -> {
-                    try {
-                        return userEntityToUser(userEntity);
-                    } catch (UserNotFoundException e) {
-                        throw new RuntimeException("Failed to convert UserEntity to User", e);
-                    }
-                })
-                .collect(Collectors.toList());
+        for(UserEntity userEntity : userEntities) {
+            users.add(userEntityToUser(userEntity));
+        }
+        return users;
     }
 
 }

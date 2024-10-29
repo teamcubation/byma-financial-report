@@ -11,6 +11,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.rep
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,16 +61,13 @@ public class UserOutAdapter implements UserOutPort {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll().stream()
-                .map(userEntity -> {
-                    try {
-                        return UserPersistenceMapper.userEntityToUser(userEntity);
-                    } catch (UserNotFoundException e) {
-                        throw new RuntimeException("Failed to convert UserEntity to User",e);
-                    }
-                })
-                .toList();
+    public List<User> getAll() throws UserNotFoundException {
+        List<User> users = new ArrayList<>();
+        List<UserEntity> userEntities = userRepository.findAll();
+        for(UserEntity userEntity : userEntities) {
+            users.add(UserPersistenceMapper.userEntityToUser(userEntity));
+        }
+        return users;
     }
 
     @Override
