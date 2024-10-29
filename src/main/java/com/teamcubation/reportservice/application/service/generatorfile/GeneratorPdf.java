@@ -17,8 +17,8 @@ import java.util.List;
 @Component
 public class GeneratorPdf {
 
-    private static final String BONDS_TITLE = "Lista de Bonos";
-    private static final String STOCKS_TITLE = "Lista de Acciones";
+    private static final String BONDS_TITLE = "List of Bonds";
+    private static final String STOCKS_TITLE = "List of Stocks";
     private static final int TITLE_FONT_SIZE = 16;
     private static final int HEADER_FONT_SIZE = 12;
     private static final int BODY_FONT_SIZE = 10;
@@ -29,6 +29,11 @@ public class GeneratorPdf {
     private static final int TABLE_COLUMNS = 4;
     private static final float SPACING_AFTER_TITLE = 10f;
     private static final float TABLE_WIDTH_PERCENTAGE = 100f;
+    private static final String COLUM_1_ID = "ID";
+    private static final String COLUM_2_NAME = "Name";
+    private static final String COLUM_3_PRICE = "Price";
+    private static final String COLUM_DIVIDEND = "Dividend (%)";
+    private static final String COLUM_INTEREST_RATE = "Interest Rate";
 
     private static final Font TITLE_FONT = new Font(Font.HELVETICA, TITLE_FONT_SIZE, Font.BOLD, TITLE_COLOR);
     private static final Font HEADER_FONT = new Font(Font.HELVETICA, HEADER_FONT_SIZE, Font.BOLD, HEADER_TEXT_COLOR);
@@ -66,7 +71,7 @@ public class GeneratorPdf {
         PdfPTable bondTable = new PdfPTable(TABLE_COLUMNS);
         bondTable.setWidthPercentage(TABLE_WIDTH_PERCENTAGE);
 
-        addTableHeader(bondTable, "ID", "Nombre", "Precio", "Tasa de Interés");
+        addTableHeader(bondTable, COLUM_1_ID, COLUM_2_NAME, COLUM_3_PRICE, COLUM_INTEREST_RATE);
 
         for (BonoDto bond : bonds) {
             bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getId()), BODY_FONT)));
@@ -84,7 +89,7 @@ public class GeneratorPdf {
         PdfPTable stockTable = new PdfPTable(TABLE_COLUMNS);
         stockTable.setWidthPercentage(TABLE_WIDTH_PERCENTAGE);
 
-        addTableHeader(stockTable, "ID", "Nombre", "Precio", "Dividendo (%)");
+        addTableHeader(stockTable, COLUM_1_ID, COLUM_2_NAME, COLUM_3_PRICE, COLUM_DIVIDEND);
 
         for (StockDto stock : stocks) {
             stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getId()), BODY_FONT)));
