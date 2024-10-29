@@ -18,8 +18,7 @@ public class Report {
     private String id;
     private String title;
     private String userEmail;
-    private String downloadUrlPdf;
-    private String downloadUrlCsv;
+    private List<String> downloadUrl;
     private LocalDateTime creationDate;
     private byte[] content;
 }

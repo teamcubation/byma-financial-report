@@ -9,7 +9,6 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ent
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,9 +24,7 @@ public class UserOutAdapter implements UserOutPort {
     public User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException {
 
         validateNullParams(user);
-
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
-
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
@@ -35,7 +32,6 @@ public class UserOutAdapter implements UserOutPort {
     public User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException {
 
         validateNullParams(email);
-        //TODO implementar custom Exception
         UserEntity userByEmail = userRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
@@ -47,7 +43,6 @@ public class UserOutAdapter implements UserOutPort {
         //TODO implementar custom Exception
 
         validateNullParams(username);
-
         UserEntity userByUsername = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
@@ -58,8 +53,6 @@ public class UserOutAdapter implements UserOutPort {
     public User findById(Long id) throws UserNotFoundException, UserEntityNotFoundException {
 
         validateNullParams(id);
-
-        //TODO implementar custom Exception
         UserEntity userById = userRepository
                 .findById(id)
                 .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
@@ -83,7 +76,6 @@ public class UserOutAdapter implements UserOutPort {
     public User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException {
 
         validateNullParams(user);
-
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         UserEntity updated = userRepository.save(userEntity);
         return UserPersistenceMapper.userEntityToUser(updated);

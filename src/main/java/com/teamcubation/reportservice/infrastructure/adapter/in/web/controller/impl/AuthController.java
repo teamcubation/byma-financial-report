@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.port.in.AuthInPort;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiAuth;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.LoginRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.RegisterRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.TokenResponseDTO;
@@ -22,10 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
-public class AuthController {
+public class AuthController implements ApiAuth {
 
     private AuthInPort authService;
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) throws UserNotFoundException, UserEntityNotFoundException {
 
@@ -35,6 +37,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Override
     @PostMapping("/register")
     public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
 

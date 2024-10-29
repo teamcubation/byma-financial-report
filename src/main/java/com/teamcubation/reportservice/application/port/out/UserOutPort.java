@@ -28,5 +28,4 @@ public interface UserOutPort {
     boolean existsByNameIgnoreCase(String name);
 
 
-
 }

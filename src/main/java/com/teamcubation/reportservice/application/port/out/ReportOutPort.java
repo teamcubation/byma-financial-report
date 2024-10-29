@@ -9,5 +9,5 @@ public interface ReportOutPort {
     List<ReportEntity> findByUserEmail(String email);
     List<ReportEntity> getAll();
     ReportEntity save(Report report);
-
+    ReportEntity findById(String id);
 }

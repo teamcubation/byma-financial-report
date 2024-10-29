@@ -5,6 +5,7 @@ import com.teamcubation.reportservice.application.service.exception.InvalidUserM
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiUser;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
@@ -24,32 +25,37 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements ApiUser {
 
     private final UserInPort userInPort;
 
+    @Override
     @PostMapping()
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         User user = UserMapper.userRequestToUser(null, userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(userInPort.create(user)));
     }
 
+    @Override
     @GetMapping()
     public ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel {
         return ResponseEntity.ok(UserMapper.usersToUserResponses(userInPort.getAll()));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getById(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException, InvalidUserModel {
         return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.findById(id)));
     }
 
+    @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable long id) throws Exception {
+    public ResponseEntity<Void> delete(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException {
         userInPort.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         validateParams(userRequest);
