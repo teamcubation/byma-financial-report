@@ -7,6 +7,7 @@ import com.teamcubation.reportservice.application.service.exception.UserDuplicat
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +22,7 @@ public class AuthService implements AuthInPort {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public String login(User user) throws Exception {
+    public String login(User user) throws UserNotFoundException, UserEntityNotFoundException {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
@@ -34,7 +35,7 @@ public class AuthService implements AuthInPort {
 
     //TODO Implementar reglas de negocio para el registro. Similar al del crud de users
     @Override
-    public String register(User user) throws UserDuplicateException, UserNotFoundException {
+    public String register(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
 
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException("Email already exists");

@@ -17,6 +17,8 @@ public class UserRequest {
     public static final String PASSWORD_CANNOT_BE_EMPTY = "The password cannot be empty";
     public static final String ROLE_CANNOT_BE_EMPTY = "The role cannot be empty";
 
+    private Long id;
+
     @NotBlank(message = NAME_CANNOT_BE_EMPTY)
     private String username;
 
