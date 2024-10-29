@@ -62,16 +62,14 @@ public class ControllerTest {
         report1.setId(ID_1);
         report1.setTitle(REPORT_1);
         report1.setUserEmail(USER_1);
-        report1.setDownloadUrlCsv(URLCSV_1);
-        report1.setDownloadUrlPdf(URLPDF_1);
+        report1.setDownloadUrl(null);
         report1.setContent(MOCK_BYTE_ARRAY_RESULT);
         report1.setCreationDate(null);
         Report report2 = new Report();
         report2.setId(ID_2);
         report2.setTitle(REPORT_2);
         report2.setUserEmail(USER_2);
-        report2.setDownloadUrlCsv(URLCSV_2);
-        report2.setDownloadUrlPdf(URLPDF_2);
+        report2.setDownloadUrl(null);
         report2.setContent(MOCK_BYTE_ARRAY_RESULT);
         report2.setCreationDate(null);
         return List.of(report1, report2);

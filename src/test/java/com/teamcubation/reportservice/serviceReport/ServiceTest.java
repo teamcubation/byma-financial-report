@@ -18,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,8 +29,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ServiceTest {
     public static final byte[] MOCK_BYTE_ARRAY_RESULT = {1, 2, 2, 3, 4, 4};
@@ -61,6 +62,10 @@ public class ServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn(TEST_GMAIL);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     List<StockDto>mockStocks(){
         List <StockDto> stocks = new ArrayList<>();
@@ -90,8 +95,7 @@ public class ServiceTest {
         reportB.setTitle(REPORT_B);
         reportB.setUserEmail(TEST_GMAIL);
         reportB.setCreationDate(LocalDateTime.now());
-        reportB.setDownloadUrlPdf(URLPDF);
-        reportB.setDownloadUrlCsv(URLCSV);
+        reportB.setDownloadUrl(null);
         reportB.setContent(new byte[]{});
         return reportB;
     }
@@ -101,8 +105,7 @@ public class ServiceTest {
         reportA.setTitle(REPORT_A);
         reportA.setUserEmail(TEST_GMAIL);
         reportA.setCreationDate(LocalDateTime.now());
-        reportA.setDownloadUrlPdf(URLPDF);
-        reportA.setDownloadUrlCsv(URLCSV);
+        reportA.setDownloadUrl(null);
         reportA.setContent(new byte[]{});
         return reportA;
     }
@@ -244,7 +247,7 @@ public class ServiceTest {
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportA));
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportB));
         when(reportOutPort.findByUserEmail(TEST_GMAIL)).thenReturn(reportList);
-        List<Report> result = reportService.findByUserEmail(TEST_GMAIL);
+        List<Report> result = reportService.findByUserEmail();
         assertEquals(result.size(), reportList.size());
     }
 }

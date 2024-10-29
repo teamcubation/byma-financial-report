@@ -131,7 +131,7 @@ public class ReportService implements ReportInPort {
         }
         log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
         throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
-    }
+        }
 
     public List<Report> findByUserEmail() {
         String userEmail = getAuthenticatedUserEmail();
