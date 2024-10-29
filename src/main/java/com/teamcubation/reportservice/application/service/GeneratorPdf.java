@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.application.service;
 
+import com.lowagie.text.Font;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -16,6 +17,23 @@ import java.util.List;
 @Component
 public class GeneratorPdf {
 
+    private static final String BONDS_TITLE = "Lista de Bonos";
+    private static final String STOCKS_TITLE = "Lista de Acciones";
+    private static final int TITLE_FONT_SIZE = 16;
+    private static final int HEADER_FONT_SIZE = 12;
+    private static final int BODY_FONT_SIZE = 10;
+    private static final Color TITLE_COLOR = Color.BLACK;
+    private static final Color HEADER_COLOR = Color.GRAY;
+    private static final Color HEADER_TEXT_COLOR = Color.WHITE;
+    private static final Color BODY_TEXT_COLOR = Color.BLACK;
+    private static final int TABLE_COLUMNS = 4;
+    private static final float SPACING_AFTER_TITLE = 10f;
+    private static final float TABLE_WIDTH_PERCENTAGE = 100f;
+
+    private static final Font TITLE_FONT = new Font(Font.HELVETICA, TITLE_FONT_SIZE, Font.BOLD, TITLE_COLOR);
+    private static final Font HEADER_FONT = new Font(Font.HELVETICA, HEADER_FONT_SIZE, Font.BOLD, HEADER_TEXT_COLOR);
+    private static final Font BODY_FONT = new Font(Font.HELVETICA, BODY_FONT_SIZE, Font.NORMAL, BODY_TEXT_COLOR);
+
     public static byte[] generatePdfContent(List<BonoDto> bonds, List<StockDto> stocks) throws DocumentException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document document = new Document();
@@ -23,74 +41,72 @@ public class GeneratorPdf {
 
         document.open();
 
-        com.lowagie.text.Font titleFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 16, com.lowagie.text.Font.BOLD, Color.BLACK);
-        com.lowagie.text.Font tableHeaderFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 12, com.lowagie.text.Font.BOLD, Color.WHITE);
-        com.lowagie.text.Font tableBodyFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 10, com.lowagie.text.Font.NORMAL, Color.BLACK);
-
-        Paragraph titleBonds = new Paragraph("Lista de Bonos", titleFont);
-        titleBonds.setAlignment(Element.ALIGN_CENTER);
-        titleBonds.setSpacingAfter(10);
-        document.add(titleBonds);
-
-        PdfPTable bondTable = new PdfPTable(4);
-        bondTable.setWidthPercentage(100);
-
-        addTableHeader(bondTable, "ID", "Nombre", "Precio", "Tasa de Interés", tableHeaderFont);
-
-        for (BonoDto bond : bonds) {
-            bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getId()), tableBodyFont)));
-            bondTable.addCell(new PdfPCell(new Phrase(bond.getName(), tableBodyFont)));
-            bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getPrice()), tableBodyFont)));
-            bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getInterestRate()) + "%", tableBodyFont)));
-        }
-
-        document.add(bondTable);
+        addTitle(document, BONDS_TITLE);
+        addBondTable(document, bonds);
 
         document.add(new Paragraph("\n"));
 
-        Paragraph titleStocks = new Paragraph("Lista de Acciones", titleFont);
-        titleStocks.setAlignment(Element.ALIGN_CENTER);
-        titleStocks.setSpacingAfter(10);
-        document.add(titleStocks);
-
-        PdfPTable stockTable = new PdfPTable(4);
-        stockTable.setWidthPercentage(100);
-
-        addTableHeader(stockTable, "ID", "Nombre", "Precio", "Dividendo (%)", tableHeaderFont);
-
-        for (StockDto stock : stocks) {
-            stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getId()), tableBodyFont)));
-            stockTable.addCell(new PdfPCell(new Phrase(stock.getName(), tableBodyFont)));
-            stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getPrice()), tableBodyFont)));
-            stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getDividend()) + "%", tableBodyFont)));
-        }
-
-        document.add(stockTable);
+        addTitle(document, STOCKS_TITLE);
+        addStockTable(document, stocks);
 
         document.close();
-
         return baos.toByteArray();
     }
 
-    private static void addTableHeader(PdfPTable table, String col1, String col2, String col3, String col4, com.lowagie.text.Font headerFont) {
-        PdfPCell header1 = new PdfPCell(new Phrase(col1, headerFont));
-        header1.setBackgroundColor(Color.GRAY);
-        header1.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(header1);
+    private static void addTitle(Document document, String titleText) throws DocumentException {
+        Paragraph title = new Paragraph(titleText, TITLE_FONT);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(SPACING_AFTER_TITLE);
+        document.add(title);
+    }
 
-        PdfPCell header2 = new PdfPCell(new Phrase(col2, headerFont));
-        header2.setBackgroundColor(Color.GRAY);
-        header2.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(header2);
+    private static void addBondTable(Document document, List<BonoDto> bonds) throws DocumentException {
+        if (bonds == null || bonds.isEmpty()) return;
 
-        PdfPCell header3 = new PdfPCell(new Phrase(col3, headerFont));
-        header3.setBackgroundColor(Color.GRAY);
-        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(header3);
+        PdfPTable bondTable = new PdfPTable(TABLE_COLUMNS);
+        bondTable.setWidthPercentage(TABLE_WIDTH_PERCENTAGE);
 
-        PdfPCell header4 = new PdfPCell(new Phrase(col4, headerFont));
-        header4.setBackgroundColor(Color.GRAY);
-        header4.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(header4);
+        addTableHeader(bondTable, "ID", "Nombre", "Precio", "Tasa de Interés");
+
+        for (BonoDto bond : bonds) {
+            bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getId()), BODY_FONT)));
+            bondTable.addCell(new PdfPCell(new Phrase(bond.getName(), BODY_FONT)));
+            bondTable.addCell(new PdfPCell(new Phrase(String.valueOf(bond.getPrice()), BODY_FONT)));
+            bondTable.addCell(new PdfPCell(new Phrase(bond.getInterestRate() + "%", BODY_FONT)));
+        }
+
+        document.add(bondTable);
+    }
+
+    private static void addStockTable(Document document, List<StockDto> stocks) throws DocumentException {
+        if (stocks == null || stocks.isEmpty()) return;
+
+        PdfPTable stockTable = new PdfPTable(TABLE_COLUMNS);
+        stockTable.setWidthPercentage(TABLE_WIDTH_PERCENTAGE);
+
+        addTableHeader(stockTable, "ID", "Nombre", "Precio", "Dividendo (%)");
+
+        for (StockDto stock : stocks) {
+            stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getId()), BODY_FONT)));
+            stockTable.addCell(new PdfPCell(new Phrase(stock.getName(), BODY_FONT)));
+            stockTable.addCell(new PdfPCell(new Phrase(String.valueOf(stock.getPrice()), BODY_FONT)));
+            stockTable.addCell(new PdfPCell(new Phrase(stock.getDividend() + "%", BODY_FONT)));
+        }
+
+        document.add(stockTable);
+    }
+
+    private static void addTableHeader(PdfPTable table, String column1Title, String column2Title, String column3Title, String column4Title) {
+        addHeaderCell(table, column1Title);
+        addHeaderCell(table, column2Title);
+        addHeaderCell(table, column3Title);
+        addHeaderCell(table, column4Title);
+    }
+
+    private static void addHeaderCell(PdfPTable table, String columnTitle) {
+        PdfPCell header = new PdfPCell(new Phrase(columnTitle, HEADER_FONT));
+        header.setBackgroundColor(HEADER_COLOR);
+        header.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(header);
     }
 }
