@@ -3,15 +3,19 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ma
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
+import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserPersistenceMapper {
 
-    public static User userEntityToUser(UserEntity userEntity) {
-        if (userEntity == null) {
+    public static User userEntityToUser(UserEntity userEntity) throws UserNotFoundException {
+        if (PersistanceValidation.isNull(userEntity)) {
             throw new UserNotFoundException();
         }
         return User.builder()
@@ -23,9 +27,9 @@ public class UserPersistenceMapper {
                 .build();
     }
 
-    public static UserEntity userToUserEntity(User user) {
-        if (user == null) {
-            throw new UserNotFoundException();
+    public static UserEntity userToUserEntity(User user) throws UserEntityNotFoundException {
+        if (PersistanceValidation.isNull(user)) {
+            throw new UserEntityNotFoundException("User entity cannot be null");
         }
         return UserEntity.builder()
                 .id(user.getId())
@@ -36,13 +40,15 @@ public class UserPersistenceMapper {
                 .build();
     }
 
-    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) {
+    public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserEntityNotFoundException, UserNotFoundException {
+        List<User> users = new ArrayList<>();
         if (userEntities == null) {
-            throw new UserNotFoundException();
+            throw new UserEntityNotFoundException("User entities cannot be null");
         }
-        return userEntities.stream()
-                .map(UserPersistenceMapper::userEntityToUser)
-                .collect(Collectors.toList());
+        for(UserEntity userEntity : userEntities) {
+            users.add(userEntityToUser(userEntity));
+        }
+        return users;
     }
 
 }
