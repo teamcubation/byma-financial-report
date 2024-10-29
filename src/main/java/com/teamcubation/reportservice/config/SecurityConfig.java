@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/report/reportHistory").hasRole("ADMIN")
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll() //permito acceso a swagger
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
