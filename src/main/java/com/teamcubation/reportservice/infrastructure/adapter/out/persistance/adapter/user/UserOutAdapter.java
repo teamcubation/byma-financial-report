@@ -11,6 +11,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.rep
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,48 +22,57 @@ public class UserOutAdapter implements UserOutPort {
     private UserRepository userRepository;
 
     @Override
-    public User registerUser(User user) {
+    public User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException {
+
         validateNullParams(user);
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
     @Override
-    public User findByEmailIgnoreCase(String email) throws UserNotFoundException {
+    public User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException {
+
         validateNullParams(email);
         UserEntity userByEmail = userRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByEmail);
     }
 
     @Override
-    public User findByUsername(String username) throws UserNotFoundException {
+    public User findByUsername(String username) throws UserNotFoundException, UserEntityNotFoundException {
+        //TODO implementar custom Exception
+
         validateNullParams(username);
         UserEntity userByUsername = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByUsername);
     }
 
     @Override
-    public User findById(Long id) throws UserNotFoundException {
+    public User findById(Long id) throws UserNotFoundException, UserEntityNotFoundException {
+
         validateNullParams(id);
         UserEntity userById = userRepository
                 .findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userById);
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll().stream()
-                .map(UserPersistenceMapper::userEntityToUser)
-                .toList();
+    public List<User> getAll() throws UserNotFoundException {
+        List<User> users = new ArrayList<>();
+        List<UserEntity> userEntities = userRepository.findAll();
+        for(UserEntity userEntity : userEntities) {
+            users.add(UserPersistenceMapper.userEntityToUser(userEntity));
+        }
+        return users;
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException {
+
         validateNullParams(user);
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         UserEntity updated = userRepository.save(userEntity);

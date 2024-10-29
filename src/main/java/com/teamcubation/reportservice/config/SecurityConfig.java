@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.service.Jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,10 +26,10 @@ public class SecurityConfig {
                 .csrf(crs -> crs.disable())
                 .authorizeHttpRequests(authRequest -> authRequest
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/api/users/public/{id}").hasRole("USER")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/report/reportHistory").hasRole("ADMIN")
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
-                        .requestMatchers("/mock/public/**").permitAll()
-                        .requestMatchers("/mock/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/mock/admin/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll() //permito acceso a swagger
                         .anyRequest().authenticated()
                 )
