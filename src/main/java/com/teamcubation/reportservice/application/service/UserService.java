@@ -73,8 +73,9 @@ public class UserService implements UserInPort {
     @Override
     public void delete(long id) throws UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.findById(id) == null) {
-            throw new UserNotFoundException();
+            throw new UserEntityNotFoundException("User not found");
         }
+      
         userOutPort.deleteUserById(id);
     }
 

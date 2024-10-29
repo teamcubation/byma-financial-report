@@ -8,12 +8,11 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ada
 import java.util.List;
 
 public interface UserInPort {
-
-    User create(User user) throws UserDuplicateException, UserNotFoundException;
+    User create(User user) throws throws UserDuplicateException, UserNotFoundException;
 
     User findById(long id) throws UserNotFoundException;
 
-    User update(long id, User user) throws UserDuplicateException, UserNotFoundException;
+    User update(long id, User user) throws UserNotFoundException, UserDuplicateException;
 
     void delete(long id) throws UserNotFoundException, UserEntityNotFoundException;
 

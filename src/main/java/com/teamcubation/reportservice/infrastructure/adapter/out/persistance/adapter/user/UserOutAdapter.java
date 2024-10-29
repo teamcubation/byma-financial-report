@@ -23,43 +23,36 @@ public class UserOutAdapter implements UserOutPort {
 
     @Override
     public User registerUser(User user) throws UserNotFoundException {
-
         validateNullParams(user);
-
+  
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
-
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
     @Override
-    public User findByEmailIgnoreCase(String email) throws Exception {
-
+    public User findByEmailIgnoreCase(String email) throws UserNotFoundException {
         validateNullParams(email);
-        //TODO implementar custom Exception
+      
         UserEntity userByEmail = userRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByEmail);
     }
 
     @Override
-    public User findByUsername(String username) throws Exception {
-        //TODO implementar custom Exception
-
+    public User findByUsername(String username) throws UserNotFoundException {
         validateNullParams(username);
-
+      
         UserEntity userByUsername = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserPersistenceMapper.userEntityToUser(userByUsername);
     }
 
     @Override
     public User findById(Long id) throws UserNotFoundException {
-
         validateNullParams(id);
-
-        //TODO implementar custom Exception
+      
         UserEntity userById = userRepository
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -78,9 +71,8 @@ public class UserOutAdapter implements UserOutPort {
 
     @Override
     public User updateUser(User user) throws UserNotFoundException {
-
         validateNullParams(user);
-
+      
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         UserEntity updated = userRepository.save(userEntity);
         return UserPersistenceMapper.userEntityToUser(updated);

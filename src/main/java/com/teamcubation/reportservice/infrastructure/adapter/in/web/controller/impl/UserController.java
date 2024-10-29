@@ -4,12 +4,14 @@ import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiUser;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,32 +23,38 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements ApiUser {
 
     private final UserInPort userInPort;
 
+    @Override
     @PostMapping()
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserDuplicateException, UserNotFoundException {
         User user = UserMapper.userRequestToUser(userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(userInPort.create(user)));
     }
 
+    @Override
     @GetMapping()
     public ResponseEntity<List<UserResponse>> getAll() throws UserNotFoundException {
         return ResponseEntity.ok(UserMapper.usersToUserResponses(userInPort.getAll()));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getById(@PathVariable long id) throws UserNotFoundException {
         return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.findById(id)));
     }
 
+    @SneakyThrows
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException {
         userInPort.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws UserDuplicateException, UserNotFoundException {
         User user = UserMapper.userRequestToUser(userRequest);
