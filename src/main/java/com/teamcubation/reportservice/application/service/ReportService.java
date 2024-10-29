@@ -44,14 +44,11 @@ public class ReportService implements ReportInPort {
 
     public byte[] generateFile(String typeFile, String typeInstrument) throws IOException {
         log.info("Generating file: typeFile={}, typeInstrument={}", typeFile, typeInstrument);
-        byte[] fileContent;
-        if (typeFile.equals(CSV_TYPE)) {
-            fileContent = generateCsv(typeInstrument);
-        } else if (typeFile.equals(PDF_TYPE)) {
-            fileContent = generatePdf(typeInstrument);
-        } else
-            throw new IllegalArgumentException(FILE_TYPE_NOT_SUPPORTED);
-
+        byte[] fileContent = switch (typeFile) {
+            case CSV_TYPE -> generateCsv(typeInstrument);
+            case PDF_TYPE -> generatePdf(typeInstrument);
+            default -> throw new IllegalArgumentException(FILE_TYPE_NOT_SUPPORTED);
+        };
         String userEmail = getAuthenticatedUserEmail();
         save(createReport(fileContent, userEmail, typeFile, typeInstrument));
         log.info("File generated successfully: typeFile={}, typeInstrument={}", typeFile, typeInstrument);
