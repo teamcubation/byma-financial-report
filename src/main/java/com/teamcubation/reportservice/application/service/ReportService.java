@@ -3,11 +3,15 @@ import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
 
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
+import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorCsv;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,7 @@ import java.util.stream.Collectors;
 public class ReportService implements ReportInPort {
     private final ConnectionOutPort connectionOutPort;
     private final ReportOutPort reportOutPort;
+    private final UserOutPort userOutPort;
 
     private static final String CSV_TYPE = "csv";
     private static final String PDF_TYPE = "pdf";
@@ -47,7 +52,7 @@ public class ReportService implements ReportInPort {
         byte[] fileContent = switch (typeFile) {
             case CSV_TYPE -> generateCsv(typeInstrument);
             case PDF_TYPE -> generatePdf(typeInstrument);
-            default -> throw new IllegalArgumentException(FILE_TYPE_NOT_SUPPORTED);
+            default -> throw new InvalidTypeFyleException(FILE_TYPE_NOT_SUPPORTED);
         };
         String userEmail = getAuthenticatedUserEmail();
         save(createReport(fileContent, userEmail, typeFile, typeInstrument));
@@ -98,36 +103,34 @@ public class ReportService implements ReportInPort {
 
     public byte[] generatePdf(String typeInstrument) throws IOException {
         log.info("Fetching all bonds and stocks for PDF generation.");
-        List<BonoDto> allBonds = connectionOutPort.getAllBonds();
-        List<StockDto> allStocks = connectionOutPort.getAllStocks();
         if (typeInstrument == null) {
-            return GeneratorPdf.generatePdfContent(allBonds, allStocks);
-        }
+            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+        } 
         if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(allBonds, null);
+            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
         }
         if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(null, allStocks);
+            return GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
         }
-        throw new IllegalArgumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
-
+        log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
     }
+
+   
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
         log.info("Fetching all stocks and stocks for PDF generation.");
-        List<BonoDto> allBonds = connectionOutPort.getAllBonds();
-        List<StockDto> allStocks = connectionOutPort.getAllStocks();
         if (typeInstrument == null) {
-            return GeneratorCsv.generateCsv(allBonds, allStocks);
-        }
+            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+        } 
         if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorCsv.generateCsv(allBonds, null);
+            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
         }
         if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorCsv.generateCsv(null, allStocks);
+            return GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
         }
         log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
-        throw new IllegalArgumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
     }
 
     public List<Report> findByUserEmail() {
