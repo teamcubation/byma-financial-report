@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 public class ServiceTest {
-    public static final byte[] BYTE_ARRAY_RESULT = {1, 2, 2, 3, 4, 4};
+    public static final byte[] MOCK_BYTE_ARRAY_RESULT = {1, 2, 2, 3, 4, 4};
     public static final String TEST_GMAIL = "test@gmail";
     public static final String INVALID = "invalid";
     public static final String BONDS = "bonds";
@@ -108,123 +108,101 @@ public class ServiceTest {
     }
     @Test
     void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException {
-        byte[] byteArrayResult = new byte[]{1,2,2,3,4,4};
-        String typeFile = PDF;
-        String typeInstrument = STOCKS;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generateFile(typeFile, typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generateFile(PDF, STOCKS);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException {
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
-        String typeFile = CSV;
-        String typeInstrument = null;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
-        try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
-            mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generateFile(typeFile, typeInstrument);
-            assertEquals(byteArrayResult, result);
+        try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
+            mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generateFile(CSV, null);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGenerateFileWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeFile = INVALID;
-        String typeInstrument = STOCKS;
-        assertThrows(InvalidTypeFyleException.class, () -> reportService.generateFile(typeFile, typeInstrument));
+        assertThrows(InvalidTypeFyleException.class, () -> reportService.generateFile(INVALID, STOCKS));
     }
 
     @Test
     void whenGeneratePdfWithStocksParams_thenReturnListOfStocksTest() throws IOException {
-        String typeInstrument = STOCKS;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generatePdf(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generatePdf(STOCKS);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGeneratePdfWithBondsParams_thenReturnListOfBondsTest() throws IOException {
-        String typeInstrument = BONDS;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generatePdf(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generatePdf(BONDS);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void generatePdfWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
-        String typeInstrument = null;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generatePdf(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generatePdf(null);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGeneratePdfWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeInstrument = INVALID;
-        assertThrows(InvalidInstrumentException.class, () -> reportService.generatePdf(typeInstrument));
+        assertThrows(InvalidInstrumentException.class, () -> reportService.generatePdf(INVALID));
     }
     @Test
     void whenGenerateCsvWithStocksParams_thenReturnListOfStocksTest() throws IOException {
-        String typeInstrument = STOCKS;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generateCsv(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generateCsv(STOCKS);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGenerateCsvWithBondsParams_thenReturnListOfBondsTest() throws IOException {
-        String typeInstrument = BONDS;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generateCsv(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generateCsv(BONDS);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGenerateCsvWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
-        String typeInstrument = null;
-        byte[] byteArrayResult = BYTE_ARRAY_RESULT;
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
-                    .thenReturn(byteArrayResult);
-            byte[] result = reportService.generateCsv(typeInstrument);
-            assertEquals(byteArrayResult, result);
+                    .thenReturn(MOCK_BYTE_ARRAY_RESULT);
+            byte[] result = reportService.generateCsv(null);
+            assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
     @Test
     void whenGenerateCsvWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
-        String typeInstrument = INVALID;
-        assertThrows(InvalidInstrumentException.class, () -> reportService.generateCsv(typeInstrument));
+        assertThrows(InvalidInstrumentException.class, () -> reportService.generateCsv(INVALID));
     }
 
     @Test

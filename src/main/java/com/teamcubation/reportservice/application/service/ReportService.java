@@ -76,16 +76,14 @@ public class ReportService implements ReportInPort {
     }
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
-        List<BonoDto> allBonds = connectionOutPort.getAllBonds();
-        List<StockDto> allStocks = connectionOutPort.getAllStocks();
         if (typeInstrument == null) {
-            return GeneratorCsv.generateCsv(allBonds, allStocks);
+            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
         }
         if (typeInstrument.equals("bonds")) {
-            return GeneratorCsv.generateCsv(allBonds, null);
+            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
         }
         if (typeInstrument.equals("stocks")) {
-            return GeneratorCsv.generateCsv(null, allStocks);
+            return GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
         }
         throw new InvalidInstrumentException("Instrument type not supported");
     }
