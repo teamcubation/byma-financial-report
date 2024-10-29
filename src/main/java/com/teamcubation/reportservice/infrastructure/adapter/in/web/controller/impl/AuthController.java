@@ -9,6 +9,8 @@ import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.RegisterRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.TokenResponseDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.AuthMapper;
+import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,7 @@ public class AuthController implements ApiAuth {
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) throws Exception {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) throws UserNotFoundException, UserEntityNotFoundException {
 
         User user = AuthMapper.LoginRequestToUser(loginRequest);
         String token = authService.login(user);
@@ -37,7 +39,7 @@ public class AuthController implements ApiAuth {
 
     @Override
     @PostMapping("/register")
-    public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) throws UserDuplicateException, UserNotFoundException {
+    public ResponseEntity<TokenResponseDTO> register(@RequestBody @Valid RegisterRequestDTO registerRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
 
         User newUserFromRequest = AuthMapper.RegisterRequestToUser(registerRequest);
         String token = authService.register(newUserFromRequest);

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +20,11 @@ import java.util.List;
 public class UserService implements UserInPort {
 
     private final UserOutPort userOutPort;
+    private final PasswordEncoder passwordEncoder;
 
     @CachePut(value = "usersCache", key = "#user.id")
     @Override
-    public User create(User user) throws UserDuplicateException, UserNotFoundException {
+    public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException();
         }
@@ -31,29 +33,31 @@ public class UserService implements UserInPort {
             throw new UserDuplicateException();
         }
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         return userOutPort.registerUser(user);
     }
 
     @Override
-    public User findById(long id) throws UserNotFoundException {
+    public User findById(long id) throws UserNotFoundException, UserEntityNotFoundException {
         return userOutPort.findById(id);
     }
 
     @CachePut(value = "usersCache", key = "#user.id")
     @Override
-    public User update(long id, User user) throws UserDuplicateException, UserNotFoundException {
+    public User update(User user) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
 
-        User existingUser = userOutPort.findById(id);
+        User existingUser = userOutPort.findById(user.getId());
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-                throw new UserDuplicateException();
+                throw new UserDuplicateException("Email already exists");
             }
             existingUser.setEmail(user.getEmail());
         }
 
         if (user.getUsername() != null) {
             if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
-                throw new UserDuplicateException();
+                throw new UserDuplicateException("Username already exists");
             }
             existingUser.setUsername(user.getUsername());
         }
@@ -65,6 +69,8 @@ public class UserService implements UserInPort {
         if (user.getPassword() != null) {
             existingUser.setPassword(user.getPassword());
         }
+
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userOutPort.updateUser(existingUser);
     }

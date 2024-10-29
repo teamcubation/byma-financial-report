@@ -1,7 +1,11 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller;
 
+import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
+import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,14 +23,14 @@ public interface ApiUser {
             @ApiResponse(responseCode = "201", description = "User created successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest);
+    ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel;
 
     @Operation(summary = "Get all users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<List<UserResponse>> getAll();
+    ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel, UserNotFoundException;
 
     @Operation(summary = "Get a user by ID")
     @ApiResponses(value = {
@@ -34,7 +38,7 @@ public interface ApiUser {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<UserResponse> getById(@PathVariable long id) throws Exception;
+    ResponseEntity<UserResponse> getById(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException, InvalidUserModel;
 
     @Operation(summary = "Update a user")
     @ApiResponses(value = {
@@ -42,7 +46,7 @@ public interface ApiUser {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody @Valid UserRequest userRequest);
+    ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel;
 
     @Operation(summary = "Delete a user")
     @ApiResponses(value = {
@@ -50,6 +54,6 @@ public interface ApiUser {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    ResponseEntity<Void> delete(@PathVariable long id);
+    ResponseEntity<Void> delete(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException;
 
 }

@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ad
 import com.teamcubation.reportservice.application.port.out.AuthOutPort;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
@@ -25,7 +26,7 @@ public class AuthOutAdapter implements AuthOutPort {
     }
 
     @Override
-    public User register(User user) throws UserNotFoundException {
+    public User register(User user) throws UserEntityNotFoundException, UserNotFoundException {
 
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -35,8 +36,8 @@ public class AuthOutAdapter implements AuthOutPort {
     }
 
     @Override
-    public User findByEmailIgnoreCase(String email) throws Exception {
-        return UserPersistenceMapper.userEntityToUser(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new Exception("User not found")));
+    public User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException {
+        return UserPersistenceMapper.userEntityToUser(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserEntityNotFoundException("User not found")));
     }
 
     @Override
