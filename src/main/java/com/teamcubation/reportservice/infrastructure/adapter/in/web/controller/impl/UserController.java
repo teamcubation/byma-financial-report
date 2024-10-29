@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws Exception {
+    public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws UserDuplicateException, UserNotFoundException {
         User user = UserMapper.userRequestToUser(userRequest);
         return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.update(id, user)));
     }

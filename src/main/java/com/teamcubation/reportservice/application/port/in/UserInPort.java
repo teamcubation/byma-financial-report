@@ -13,7 +13,7 @@ public interface UserInPort {
 
     User findById(long id) throws UserNotFoundException;
 
-    User update(long id, User user) throws Exception;
+    User update(long id, User user) throws UserDuplicateException, UserNotFoundException;
 
     void delete(long id) throws UserNotFoundException, UserEntityNotFoundException;
 
