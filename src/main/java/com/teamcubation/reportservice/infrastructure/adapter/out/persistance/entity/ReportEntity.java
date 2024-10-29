@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,11 +17,10 @@ import java.time.LocalDateTime;
 public class ReportEntity {
     @Id
     private String id;
-    @Indexed(unique = true)
     private String title;
+    @Indexed(unique = true)
     private String userEmail;
-    private String downloadUrlPdf;
-    private String downloadUrlCsv;
+    private List<String> downloadUrl;
     private LocalDateTime creationDate;
     private byte[] content;
 }

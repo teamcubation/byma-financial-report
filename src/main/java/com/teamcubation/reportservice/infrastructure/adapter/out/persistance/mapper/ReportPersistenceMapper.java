@@ -15,8 +15,7 @@ public class ReportPersistenceMapper {
                 .title(reportEntity.getTitle())
                 .userEmail(reportEntity.getUserEmail())
                 .creationDate(reportEntity.getCreationDate())
-                .downloadUrlPdf(reportEntity.getDownloadUrlPdf())
-                .downloadUrlCsv(reportEntity.getDownloadUrlCsv())
+                .downloadUrl(reportEntity.getDownloadUrl())
                 .content(reportEntity.getContent())
                 .build();
 
@@ -29,8 +28,7 @@ public class ReportPersistenceMapper {
                 .title(report.getTitle())
                 .userEmail(report.getUserEmail())
                 .creationDate(LocalDateTime.now())
-                .downloadUrlPdf(report.getDownloadUrlPdf())
-                .downloadUrlCsv(report.getDownloadUrlCsv())
+                .downloadUrl(report.getDownloadUrl())
                 .content(report.getContent())
                 .build();
 

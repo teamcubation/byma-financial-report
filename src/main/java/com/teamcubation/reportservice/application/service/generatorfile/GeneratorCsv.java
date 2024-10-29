@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.application.service;
+package com.teamcubation.reportservice.application.service.generatorfile;
 import com.opencsv.CSVWriter;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
@@ -15,8 +15,12 @@ public class GeneratorCsv {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVWriter writer = new CSVWriter(new OutputStreamWriter(out));
 
-        writer.writeAll(generateCsvBonds(bonds));
-        writer.writeAll(generateCsvStocks(stocks));
+        if (bonds != null) {
+            writer.writeAll(generateCsvBonds(bonds));
+        }
+        if (stocks != null) {
+            writer.writeAll(generateCsvStocks(stocks));
+        }
 
         writer.close();
         return out.toByteArray();

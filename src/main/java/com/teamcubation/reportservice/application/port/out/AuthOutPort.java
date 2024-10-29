@@ -8,6 +8,9 @@ public interface AuthOutPort {
 
     User register(User user);
 
+    User findByEmailIgnoreCase(String email) throws Exception;
+
+
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByUserNameIgnoreCase(String username);
