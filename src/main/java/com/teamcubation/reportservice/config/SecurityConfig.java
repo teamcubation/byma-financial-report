@@ -1,23 +1,24 @@
 package com.teamcubation.reportservice.config;
 
+import com.teamcubation.reportservice.application.service.Jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    //public final AuthenticationProvider authenticationProvider;
+    private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthFilter jwtAuthFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -26,14 +27,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
                         .requestMatchers("/mock/public/**").permitAll()
-                        .requestMatchers("/mock/user/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/mock/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/mock/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll() //permito acceso a swagger
                         .anyRequest().authenticated()
                 )
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(authenticationProvider)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))  // Deshabilitar protección de frame para H2
-                .httpBasic(Customizer.withDefaults()) // Habilitar autenticación basada en HTTP, User y Password en application.properties. En futuras tareas se va a  configurar para que sea en base a los users de la DB
                 .build();
     }
 

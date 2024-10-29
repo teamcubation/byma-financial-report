@@ -9,5 +9,7 @@ public interface ReportInPort {
     byte[] generateFile(String typeFile, String typeInstrument) throws IOException;
     byte[] generatePdf(String typeInstrument) throws IOException;
     byte[] generateCsv(String typeInstrument) throws IOException;
+    byte[] downloadFile(String id) throws IOException;
     List<Report> getAllReports();
+    List<Report> findByUserEmail();
 }

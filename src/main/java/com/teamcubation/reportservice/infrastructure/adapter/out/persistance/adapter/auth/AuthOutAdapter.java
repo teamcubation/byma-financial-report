@@ -34,6 +34,11 @@ public class AuthOutAdapter implements AuthOutPort {
     }
 
     @Override
+    public User findByEmailIgnoreCase(String email) throws Exception {
+        return UserPersistenceMapper.userEntityToUser(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new Exception("User not found")));
+    }
+
+    @Override
     public boolean existsByEmailIgnoreCase(String email) {
         return userRepository.existsByEmailIgnoreCase(email);
     }
