@@ -26,24 +26,59 @@ class UserServiceTest {
     private UserOutPort userOutPort;
 
     private User user;
-    private Long id = 8L;
+    private static final Long ID_1 = 1L;
+    private static final long ID_2 = 2L;
+    private static final long ID_3 = 3L;
+    private static final String EMAIL_1 = "email1@gmail.com";
+    private static final String EMAIL_2 = "email2@gmail.com";
+    private static final String EMAIL_3 = "email3@gmail.com";
+    private static final String NAME_1 = "name_1";
+    private static final String NAME_2 = "name_2";
+    private static final String NAME_3 = "name_3";
+    private static final String PASSWORD_1 = "password_1";
+    private static final String PASSWORD_2 = "password_2";
+    private static final String PASSWORD_3 = "password_3";
+    private static final long ID_NONEXISTENT = 8L;
+
+
+    private List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        user = User.builder()
-                .id(id)
-                .username("test1")
-                .password("1234")
-                .email("test@gmail.com")
+        users.add(User.builder()
+                .id(ID_1)
+                .email(EMAIL_1)
+                .username(NAME_1)
                 .role(UserRole.USER)
-                .build();
+                .password(PASSWORD_1)
+                .build());
+        users.add(User.builder()
+                .id(ID_2)
+                .email(EMAIL_2)
+                .username(NAME_2)
+                .role(UserRole.USER)
+                .password(PASSWORD_2)
+                .build());
+        users.add(User.builder()
+                .id(ID_3)
+                .email(EMAIL_3)
+                .username(NAME_3)
+                .role(UserRole.USER)
+                .password(PASSWORD_3)
+                .build());
+
+        user =  User.builder()
+                .id(ID_1)
+                .email(EMAIL_1)
+                .username(NAME_1)
+                .role(UserRole.USER)
+                .password(PASSWORD_1).build();
     }
 
     @Test
     void shouldReturnAUser_whenCreateAUser() {
-
         when(userOutPort.registerUser(user)).thenReturn(user);
 
         User result = userService.create(user);
@@ -55,61 +90,44 @@ class UserServiceTest {
 
     @Test
     void shouldReturnExceptionDuplicateUser_whenCreateAUserWithDuplicateName() {
-        User userWithDuplicatedName = User.builder()
-                .username("test")
-                .password("1234")
-                .email("test2@gmail.com")
-                .role(UserRole.USER)
-                .build();
+        when(userOutPort.existsByNameIgnoreCase(user.getUsername())).thenReturn(true);
 
-        when(userOutPort.existsByNameIgnoreCase(userWithDuplicatedName.getUsername())).thenReturn(true);
-
-        assertThrows(UserDuplicateException.class, () -> userService.create(userWithDuplicatedName));
+        assertThrows(UserDuplicateException.class, () -> userService.create(user));
     }
 
     @Test
     void shouldReturnExceptionDuplicateUser_whenCreateAUserWithDuplicateEmail() {
-        User userWithDuplicatedEmail = User.builder()
-                .username("test2")
-                .password("1234")
-                .email("test@gmail.com")
-                .role(UserRole.USER)
-                .build();
+        when(userOutPort.existsByEmailIgnoreCase(user.getEmail())).thenReturn(true);
 
-        when(userOutPort.existsByEmailIgnoreCase(userWithDuplicatedEmail.getEmail())).thenReturn(true);
-
-        assertThrows(UserDuplicateException.class, () -> userService.create(userWithDuplicatedEmail));
+        assertThrows(UserDuplicateException.class, () -> userService.create(user));
     }
 
     @Test
     void shouldReturnAUser_WhenFindAUserById() {
-        user.setId(id);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
 
-        when(userOutPort.findById(id)).thenReturn(user);
-
-        User result = userService.findById(id);
+        User result = userService.findById(ID_1);
         assertEquals(user.getId(), result.getId());
     }
 
     @Test
     void shouldThrowUserNotFoundException_whenNotFoundAId() {
-        when(userOutPort.findById(id)).thenThrow(new UserNotFoundException());
-        assertThrows(UserNotFoundException.class, () -> userService.findById(id));
+        when(userOutPort.findById(ID_NONEXISTENT)).thenThrow(new UserNotFoundException());
+        assertThrows(UserNotFoundException.class, () -> userService.findById(ID_NONEXISTENT));
     }
 
     @Test
     void shouldReturnUserUpdateEmail_whenUpdateEmail() throws Exception {
         User userToUpdate = User.builder()
-                        .id(id)
                         .email("newEmail@gmail.com")
                         .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
         when(userOutPort.existsByEmailIgnoreCase(userToUpdate.getEmail())).thenReturn(false);
         user.setEmail("newEmail@gmail.com");
         when(userOutPort.updateUser(user)).thenReturn(user);
 
-        User result = userService.update(id, userToUpdate);
+        User result = userService.update(ID_1, userToUpdate);
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRole(), result.getRole());
         assertEquals(user.getPassword(), result.getPassword());
@@ -119,16 +137,15 @@ class UserServiceTest {
     @Test
     void shouldReturnUserWithUpdateUserName_whenUpdateUserName() throws Exception {
         User userToUpdate = User.builder()
-                .id(id)
-                .username("Test100000")
+                .username("newName")
                 .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
         when(userOutPort.existsByNameIgnoreCase(userToUpdate.getUsername())).thenReturn(false);
-        user.setUsername("Test100000");
+        user.setUsername("newName");
         when(userOutPort.updateUser(user)).thenReturn(user);
 
-        User result = userService.update(id, userToUpdate);
+        User result = userService.update(ID_1, userToUpdate);
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRole(), result.getRole());
         assertEquals(user.getPassword(), result.getPassword());
@@ -138,15 +155,15 @@ class UserServiceTest {
     @Test
     void shouldReturnUserWithUpdatePassword_whenUpdatePassword() throws Exception {
         User userToUpdate = User.builder()
-                .id(id)
-                .password("NewPassword")
+                .password("newPassword")
                 .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
-        user.setPassword("NewPassword");
+        when(userOutPort.findById(ID_1)).thenReturn(user);
+        user.setPassword("newPassword");
         when(userOutPort.updateUser(user)).thenReturn(user);
 
-        User result = userService.update(id, userToUpdate);
+        User result = userService.update(ID_1, userToUpdate);
+
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRole(), result.getRole());
         assertEquals(user.getPassword(), result.getPassword());
@@ -156,15 +173,14 @@ class UserServiceTest {
     @Test
     void shouldReturnUserWithUpdateRole_whenUpdateRole() throws Exception {
         User userToUpdate = User.builder()
-                .id(id)
                 .role(UserRole.ADMIN)
                 .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
         user.setRole(UserRole.ADMIN);
         when(userOutPort.updateUser(user)).thenReturn(user);
 
-        User result = userService.update(id, userToUpdate);
+        User result = userService.update(ID_1, userToUpdate);
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRole(), result.getRole());
         assertEquals(user.getPassword(), result.getPassword());
@@ -174,59 +190,52 @@ class UserServiceTest {
     @Test
     void shouldReturnExceptionDuplicateUser_whenUpdateAUserWithDuplicateEmail() {
         User userToUpdate = User.builder()
-                .id(id)
-                .email("newEmail@gmail.com")
+                .email("duplicated email")
                 .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
         when(userOutPort.existsByEmailIgnoreCase(userToUpdate.getEmail())).thenReturn(true);
-        when(userOutPort.updateUser(user)).thenReturn(user);
 
-        assertThrows(UserDuplicateException.class, () -> userService.update(id, userToUpdate));
+        assertThrows(UserDuplicateException.class, () -> userService.update(ID_1, userToUpdate));
     }
 
     @Test
     void shouldReturnExceptionDuplicateUser_whenUpdateAUserWithDuplicateName() {
         User userToUpdate = User.builder()
-                .id(id)
-                .username("newName")
+                .username("duplicated name")
                 .build();
 
-        when(userOutPort.findById(id)).thenReturn(user);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
         when(userOutPort.existsByNameIgnoreCase(userToUpdate.getUsername())).thenReturn(true);
-        when(userOutPort.updateUser(user)).thenReturn(user);
 
-        assertThrows(UserDuplicateException.class, () -> userService.update(id, userToUpdate));
-    }
-
-    @Test
-    void shouldThrowUserNotFoundException_whenDeleteUserWithInexistentId() {
-        when(userOutPort.findById(id)).thenReturn(null);
-
-        assertThrows(UserNotFoundException.class, () -> userService.delete(id));
+        assertThrows(UserDuplicateException.class, () -> userService.update(ID_1, userToUpdate));
     }
 
     @Test
     void shouldDeleteAUser_whenDeleteUser() throws Exception {
-        when(userOutPort.findById(id)).thenReturn(user);
-        doNothing().when(userOutPort).deleteUserById(id);
-        userService.delete(id);
+        when(userOutPort.findById(ID_1)).thenReturn(user);
+        doNothing().when(userOutPort).deleteUserById(ID_1);
+        userService.delete(ID_1);
 
-        verify(userOutPort,times(1)).deleteUserById(id);
+        verify(userOutPort,times(1)).deleteUserById(ID_1);
+    }
+
+    @Test
+    void shouldThrowUserNotFoundException_whenDeleteUserWithInexistentId() {
+        when(userOutPort.findById(ID_NONEXISTENT)).thenReturn(null);
+
+        assertThrows(UserNotFoundException.class, () -> userService.delete(ID_1));
     }
 
     @Test
     void shouldReturnAllUsers_whenGetAllUsers() {
-        List<User> usersTest = new ArrayList<>();
-        usersTest.add(user);
-        usersTest.add(user);
-        usersTest.add(user);
+        when(userOutPort.getAll()).thenReturn(users);
 
-        when(userOutPort.getAll()).thenReturn(usersTest);
         List<User> result = userService.getAll();
-        assertEquals(usersTest.size(), result.size());
-        for (User userResult : result){
-            assertEquals(user, userResult);
+
+        assertEquals(users.size(), result.size());
+        for (int i = 0; i < result.size(); i++){
+            assertEquals(users.get(i), result.get(i));
         }
     }
 }
