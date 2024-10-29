@@ -95,9 +95,9 @@ class UserControllerTest {
 
     @Test
     void shouldRegisterAUserSuccess_whenCreateAUser() throws Exception {
-        User userCreate = mapperUserRequestToUserWithId(ID_1, userRequest);
+        User userCreate = UserMapper.userRequestToUser(ID_1, userRequest);
 
-        when(userInPort.create(UserMapper.userRequestToUser(userRequest))).thenReturn(userCreate);
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenReturn(userCreate);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequest);
@@ -113,7 +113,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnStatusCode409_whenUserToCreateAlreadyExists() throws Exception {
-        when(userInPort.create(UserMapper.userRequestToUser(userRequest))).thenThrow(new UserDuplicateException("User Duplicated"));
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException("User Duplicated"));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequest);
@@ -241,8 +241,8 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        User userToUpdate = mapperUserRequestToUserWithId(ID_1, userRequestToUpdate);
-        when(userInPort.update(ID_1, UserMapper.userRequestToUser(userRequestToUpdate))).thenReturn(userToUpdate);
+        User userToUpdate = UserMapper.userRequestToUser(ID_1,userRequest);
+        when(userInPort.update(ID_1, UserMapper.userRequestToUser(null, userRequestToUpdate))).thenReturn(userToUpdate);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequestToUpdate);
@@ -265,7 +265,7 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        when(userInPort.update(ID_1, UserMapper.userRequestToUser(userRequestToUpdateWithSameName))).thenThrow(new UserDuplicateException("User Duplicated"));
+        when(userInPort.update(ID_1, UserMapper.userRequestToUser(null, userRequestToUpdateWithSameName))).thenThrow(new UserDuplicateException("User Duplicated"));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequestToUpdateWithSameName);
@@ -286,7 +286,7 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        when(userInPort.update(ID_1, UserMapper.userRequestToUser(userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException("User Duplicated"));
+        when(userInPort.update(ID_1, UserMapper.userRequestToUser(null, userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException("User Duplicated"));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequestToUpdateWithSameEmail);
@@ -300,7 +300,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnStatusCode409_whenUpdateUserIsNotFound() throws Exception {
-        when(userInPort.update(ID_NONEXISTENT, UserMapper.userRequestToUser(userRequest))).thenThrow(new UserNotFoundException("User not found"));
+        when(userInPort.update(ID_NONEXISTENT, UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserNotFoundException("User not found"));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(userRequest);
@@ -310,11 +310,5 @@ class UserControllerTest {
                         .content(jsonContent))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("User not found"));
-    }
-
-    public User mapperUserRequestToUserWithId(long id, UserRequest userRequest) throws UserNotFoundException {
-        User user = UserMapper.userRequestToUser(userRequest);
-        user.setId(id);
-        return user;
     }
 }
