@@ -2,12 +2,15 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.en
 
 
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.role.RoleEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -31,8 +34,12 @@ public class UserEntity {
 
     private String password;
 
-
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<RoleEntity> roles;
 
 }
