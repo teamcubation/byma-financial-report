@@ -20,6 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class AuthService implements AuthInPort {
 
+    public static final String ADMIN_EMAIL = "admin@gmail.com";
     private final AuthOutPort authOutPort;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -48,7 +49,7 @@ public class AuthService implements AuthInPort {
             throw new UserDuplicateException("Username already exists");
         }
         //Hardcodeamos el rol de admin
-        if (user.getEmail().equalsIgnoreCase("admin@gmail.com")) {
+        if (user.getEmail().equalsIgnoreCase(ADMIN_EMAIL)) {
             user.setRoles(Set.of(Role.builder().role(UserRole.USER).build(), Role.builder().role(UserRole.ADMIN).build()));
             //user.setRoles(Set.of(Role.builder().role(UserRole.ADMIN).build()));
 
