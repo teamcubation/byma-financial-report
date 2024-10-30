@@ -154,7 +154,6 @@ public class ReportService implements ReportInPort {
 
     @CacheEvict(value = "reportsCache", key = "#userEmail")
     public Report save(Report report) {
-        String userEmail = getAuthenticatedUserEmail();
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }
 }
