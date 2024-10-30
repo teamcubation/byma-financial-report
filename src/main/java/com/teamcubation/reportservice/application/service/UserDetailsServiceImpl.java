@@ -17,7 +17,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +35,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         //este llamado a userRepostory podria ser un call al servicio de autenticacion
         UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException(MessageException.USER_NOT_FOUND));
-        List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
-
+        //List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
+        List<GrantedAuthority> authoritiesFromDb = userFromDb.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole().name())).collect(Collectors.toCollection(ArrayList::new));
         return new UserAuthenticated(userFromDb, authoritiesFromDb);
 
     }

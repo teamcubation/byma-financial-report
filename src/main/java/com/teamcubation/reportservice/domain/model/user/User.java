@@ -1,9 +1,12 @@
 package com.teamcubation.reportservice.domain.model.user;
 
+import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +22,6 @@ public class User {
 
     private String password;
 
-    private UserRole role;
+    private Set<Role> roles;
 
 }

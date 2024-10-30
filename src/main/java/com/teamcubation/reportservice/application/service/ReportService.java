@@ -1,13 +1,14 @@
 package com.teamcubation.reportservice.application.service;
+
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
-
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorCsv;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
@@ -15,13 +16,13 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ada
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -61,9 +62,9 @@ public class ReportService implements ReportInPort {
         return fileContent;
     }
 
-    private String getAuthenticatedUserEmail(){
+    private String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()){
+        if (authentication != null && authentication.isAuthenticated()) {
             log.info("Authenticated user email: {}", authentication.getName());
             return authentication.getName();
         }
@@ -90,48 +91,43 @@ public class ReportService implements ReportInPort {
         savedReport.setDownloadUrl(downloadUrls);
         log.info("Report created successfully with ID: {}", savedReport.getId());
         return save(savedReport);
-
     }
 
-    public byte[] downloadFile(String id) throws IOException {
+    public byte[] downloadFile(String id) {
         ReportEntity reportEntity = reportOutPort.findById(id);
         if (reportEntity == null) {
-            log.warn(REPORT_NOT_FOUND);
-            throw new RuntimeException(REPORT_NOT_FOUND);
+            log.error(REPORT_NOT_FOUND);
+            throw new ReportNotFoundException(REPORT_NOT_FOUND);
         }
         return reportEntity.getContent();
     }
 
     public byte[] generatePdf(String typeInstrument) throws IOException {
         log.info("Fetching all bonds and stocks for PDF generation.");
-        if (typeInstrument == null) {
-            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
-        if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
-        }
-        if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
-        }
-        log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
-        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        return switch (typeInstrument) {
+            case null ->
+                    GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+            case BONDS_TYPE -> GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
+            case STOCKS_TYPE -> GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
+            default -> {
+                log.error(INSTRUMENT_TYPE_NOT_SUPPORTED);
+                throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+            }
+        };
     }
 
-   
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
         log.info("Fetching all stocks and stocks for PDF generation.");
-        if (typeInstrument == null) {
-            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
-        if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
-        }
-        if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
-        }
-        log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
-        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        return switch (typeInstrument) {
+            case null -> GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+            case BONDS_TYPE -> GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
+            case STOCKS_TYPE -> GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
+            default -> {
+                log.error(INSTRUMENT_TYPE_NOT_SUPPORTED);
+                throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+            }
+        };
     }
 
     public List<Report> findByUserEmail() throws InvalidObject {
