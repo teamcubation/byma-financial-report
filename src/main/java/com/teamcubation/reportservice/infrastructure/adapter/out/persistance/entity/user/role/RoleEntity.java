@@ -3,17 +3,15 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.en
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "role")
-@Data
+@Table(name = "roles")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -27,5 +25,6 @@ public class RoleEntity {
     private UserRole role;
 
     @ManyToMany(mappedBy = "roles")
+    @Builder.Default
     private Set<UserEntity> users = new HashSet<>(); // <--- OneToMany -->
 }

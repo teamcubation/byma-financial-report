@@ -5,6 +5,7 @@ import com.teamcubation.reportservice.application.port.out.AuthOutPort;
 import com.teamcubation.reportservice.application.service.Jwt.JwtService;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
@@ -12,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -46,7 +49,7 @@ public class AuthService implements AuthInPort {
         }
         //Hardcodeamos el rol de admin
         if (user.getEmail().equalsIgnoreCase("admin@gmail.com")) {
-            user.setRole(UserRole.ADMIN);
+            user.setRoles(Set.of(Role.builder().role(UserRole.ADMIN).build()));
         }
         User createdUser = authOutPort.register(user);
         String token = jwtService.generateToken(createdUser);

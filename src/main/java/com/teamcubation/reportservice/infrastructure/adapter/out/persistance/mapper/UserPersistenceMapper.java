@@ -1,11 +1,13 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper;
 
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.role.RoleEntity;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class UserPersistenceMapper {
                 .username(userEntity.getUsername())
                 .email(userEntity.getEmail())
                 .password(userEntity.getPassword())
-                .role(UserRole.valueOf(userEntity.getRole().toString()))
+                .roles(userEntity.getRoles().stream().map(role -> Role.builder().id(role.getId()).role(role.getRole()).build()).collect(Collectors.toSet()))
                 .build();
     }
 
@@ -36,7 +38,7 @@ public class UserPersistenceMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .role(user.getRole())
+                .roles(user.getRoles().stream().map(role -> RoleEntity.builder().id(role.getId()).role(role.getRole()).build()).collect(Collectors.toSet()))
                 .build();
     }
 
