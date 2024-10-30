@@ -49,7 +49,9 @@ public class AuthService implements AuthInPort {
         }
         //Hardcodeamos el rol de admin
         if (user.getEmail().equalsIgnoreCase("admin@gmail.com")) {
-            user.setRoles(Set.of(Role.builder().role(UserRole.ADMIN).build()));
+            user.setRoles(Set.of(Role.builder().role(UserRole.USER).build(), Role.builder().role(UserRole.ADMIN).build()));
+            //user.setRoles(Set.of(Role.builder().role(UserRole.ADMIN).build()));
+
         }
         User createdUser = authOutPort.register(user);
         String token = jwtService.generateToken(createdUser);
