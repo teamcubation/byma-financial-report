@@ -12,6 +12,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.validation.ControllerValidator;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
+import com.teamcubation.reportservice.util.CurlGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,25 +33,37 @@ public class UserController implements ApiUser {
     @Override
     @PostMapping()
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
-        User user = UserMapper.userRequestToUser(null, userRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(userInPort.create(user)));
+        String url = "/api/users";
+        String method = "POST";
+        String contentType = "application/json";
+
+        log.info("[UserController] User request received in curl format: {}\n", CurlGenerator.generateCurl(url, method, contentType, userRequest));
+        UserResponse userResponse = UserMapper.userToUserResponse(userInPort.create(UserMapper.userRequestToUser(null, userRequest)));
+        log.info("[UserController] User response created: {}\n", userResponse);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
     @Override
     @GetMapping()
     public ResponseEntity<List<UserResponse>> getAll() throws InvalidUserModel, UserNotFoundException {
+        log.info("[UserController] Getting all users");
         return ResponseEntity.ok(UserMapper.usersToUserResponses(userInPort.getAll()));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getById(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException, InvalidUserModel {
-        return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.findById(id)));
+        log.info("[UserController] Getting user by id: {}", id);
+        UserResponse userResponse = UserMapper.userToUserResponse(userInPort.findById(id));
+        log.info("[UserController] User found: {}", userResponse);
+        return ResponseEntity.ok(userResponse);
     }
 
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) throws UserNotFoundException, UserEntityNotFoundException {
+        log.info("[UserController] Deleting user by id: {}", id);
         userInPort.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -59,22 +72,26 @@ public class UserController implements ApiUser {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable long id, @RequestBody UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         validateParams(userRequest);
-        User user = UserMapper.userRequestToUser(id ,userRequest);
-        return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.update(user)));
+        log.info("[UserController] Updating user by id: {} with data: {}", id, userRequest);
+        UserResponse userResponse = UserMapper.userToUserResponse(userInPort.update(UserMapper.userRequestToUser(id, userRequest)));
+        log.info("[UserController] User updated: {}", userResponse);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PutMapping("public/{id}")
     public ResponseEntity<UserResponse> updateRegularUser(@PathVariable long id, @RequestBody UserUpdateRequestDTO userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         validateParams(userRequest);
+        log.info("[UserController] Updating user by id: {} with data: {}", id, userRequest);
         User user = UserMapper.userUpdateRequestDTOToUser(id, userRequest);
+        log.info("[UserController] User updated: {}", user);
         return ResponseEntity.ok(UserMapper.userToUserResponse(userInPort.update(user)));
     }
 
-    private void validateParams(Object ...params) throws InvalidUserModel {
-            if (ControllerValidator.isNull(params)) {
-                log.error("Params cannot be null");
-                throw new InvalidUserModel("User not found");
-            }
+    private void validateParams(Object... params) throws InvalidUserModel {
+        if (ControllerValidator.isNull(params)) {
+            log.error("Params cannot be null");
+            throw new InvalidUserModel("User not found");
+        }
 
     }
 

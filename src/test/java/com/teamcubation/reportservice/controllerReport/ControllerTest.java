@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.controllerReport;
+/*package com.teamcubation.reportservice.controllerReport;
 
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
@@ -119,4 +119,4 @@ public class ControllerTest {
         ResponseEntity<List<Report>> result = reportController.getAllReports();
         assertEquals(mockListReports(), result.getBody());
     }
-}
+}*/

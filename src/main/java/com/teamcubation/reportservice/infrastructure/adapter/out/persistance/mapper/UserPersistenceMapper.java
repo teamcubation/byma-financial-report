@@ -6,38 +6,44 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 public class UserPersistenceMapper {
 
     public static User userEntityToUser(UserEntity userEntity) throws UserNotFoundException {
         if (PersistanceValidation.isNull(userEntity)) {
             throw new UserNotFoundException();
         }
-        return User.builder()
+
+        User user = User.builder()
                 .id(userEntity.getId())
                 .username(userEntity.getUsername())
                 .email(userEntity.getEmail())
                 .password(userEntity.getPassword())
                 .role(UserRole.valueOf(userEntity.getRole().toString()))
                 .build();
+        log.info("[UserPersistenceMapper] UserEntity mapped to User: {}", user);
+        return user;
     }
 
     public static UserEntity userToUserEntity(User user) throws UserEntityNotFoundException {
         if (PersistanceValidation.isNull(user)) {
             throw new UserEntityNotFoundException("User entity cannot be null");
         }
-        return UserEntity.builder()
+        log.info("[UserPersistenceMapper] Mapping user to UserEntity: {}", user);
+        UserEntity userEntity = UserEntity.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole())
                 .build();
+        log.info("[UserPersistenceMapper] User mapped to UserEntity: {}", userEntity);
+        return userEntity;
     }
 
     public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserEntityNotFoundException, UserNotFoundException {
@@ -45,7 +51,7 @@ public class UserPersistenceMapper {
         if (userEntities == null) {
             throw new UserEntityNotFoundException("User entities cannot be null");
         }
-        for(UserEntity userEntity : userEntities) {
+        for (UserEntity userEntity : userEntities) {
             users.add(userEntityToUser(userEntity));
         }
         return users;

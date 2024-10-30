@@ -11,12 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class UserMapper {
 
-    public static User userRequestToUser(Long id, UserRequest userRequest) throws  InvalidUserModel {
+    public static User userRequestToUser(Long id, UserRequest userRequest) throws InvalidUserModel {
         validateParams(userRequest);
 
         User user = User.builder()
@@ -29,32 +28,35 @@ public class UserMapper {
         if (userRequest.getRole() != null) {
             user.setRole(mapRole(userRequest.getRole()));
         }
+        log.info("[UserMapper] UserRequest mapped to User: {}", user);
 
         return user;
     }
 
 
-
-
     public static UserResponse userToUserResponse(User user) throws InvalidUserModel {
         validateParams(user);
-        return UserResponse.builder()
+        UserResponse userResponse = UserResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole().name())
                 .build();
+        log.info("[UserMapper] User mapped to UserResponse: {}", userResponse);
+        return userResponse;
     }
 
-    public static User userUpdateRequestDTOToUser(long id, UserUpdateRequestDTO userUpdateRequestDTO) throws  InvalidUserModel {
+    public static User userUpdateRequestDTOToUser(long id, UserUpdateRequestDTO userUpdateRequestDTO) throws InvalidUserModel {
         validateParams(userUpdateRequestDTO);
-        return User.builder()
+        User user = User.builder()
                 .id(id)
                 .username(userUpdateRequestDTO.getUsername())
                 .email(userUpdateRequestDTO.getEmail())
                 .password(userUpdateRequestDTO.getPassword())
                 .role(UserRole.USER)
                 .build();
+        log.info("[UserMapper] UserUpdateRequestDTO mapped to User: {}", user);
+        return user;
     }
 
     private static UserRole mapRole(String role) {
@@ -68,15 +70,16 @@ public class UserMapper {
     public static List<UserResponse> usersToUserResponses(List<User> users) throws InvalidUserModel {
         validateParams(users);
         List<UserResponse> userResponses = new ArrayList<>();
-        for(User user : users) {
+        for (User user : users) {
+            log.info("[UserMapper] Mapping user to UserResponse: {}", user);
             userResponses.add(userToUserResponse(user));
         }
         return userResponses;
     }
 
-    private static void validateParams(Object ...params) throws InvalidUserModel {
+    private static void validateParams(Object... params) throws InvalidUserModel {
         if (ControllerValidator.isNull(params)) {
-            log.error("Params cannot be null");
+            log.error("[UserMapper] Params cannot be null");
 
             throw new InvalidUserModel("User not found");
         }

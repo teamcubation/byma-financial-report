@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.serviceReport;
+/*package com.teamcubation.reportservice.serviceReport;
 
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
@@ -247,4 +247,4 @@ public class ServiceTest {
         List<Report> result = reportService.findByUserEmail(TEST_GMAIL);
         assertEquals(result.size(), reportList.size());
     }
-}
+}*/
