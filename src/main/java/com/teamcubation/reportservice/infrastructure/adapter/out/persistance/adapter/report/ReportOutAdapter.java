@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ad
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class ReportOutAdapter implements ReportOutPort {
     }
 
     @Override
-    public ReportEntity save(Report report) {
+    public ReportEntity save(Report report) throws InvalidObject {
         log.info("Entro a la bdd - save");
         return reportRepository.save(ReportPersistenceMapper.reportModelToReportEntity(report));
     }

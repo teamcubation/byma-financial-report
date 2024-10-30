@@ -2,12 +2,13 @@ package com.teamcubation.reportservice.application.port.out;
 
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 
 import java.util.List;
 
 public interface ReportOutPort {
     List<ReportEntity> findByUserEmail(String email);
     List<ReportEntity> getAll();
-    ReportEntity save(Report report);
+    ReportEntity save(Report report) throws InvalidObject;
     ReportEntity findById(String id);
 }

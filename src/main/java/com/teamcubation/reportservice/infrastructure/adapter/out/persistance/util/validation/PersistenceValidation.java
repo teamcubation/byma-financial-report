@@ -1,9 +1,11 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.util.validation;
 
-public class PersistenceValidation {
-    public static final String INVALID_DATA = "Invalid data";
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 
-    public static void validateObjetNotNull(Object object) {
-        if (object == null) throw new RuntimeException(INVALID_DATA);
+public class PersistenceValidation {
+    public static final String INVALID_DATA= "Invalid data";
+
+    public static void validateObjetNotNull(Object object) throws InvalidObject {
+        if (object == null) throw new InvalidObject(INVALID_DATA);
     }
 }

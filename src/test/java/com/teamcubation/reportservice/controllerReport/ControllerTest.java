@@ -5,6 +5,7 @@ import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInst
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl.ReportController;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -37,13 +38,10 @@ public class ControllerTest {
     public static final String ID_1 = "1";
     public static final String REPORT_1 = "report1";
     public static final String USER_1 = "user1";
-    public static final String URLCSV_1 = "urlcsv1";
-    public static final String URLPDF_1 = "urlpdf1";
     public static final String ID_2 = "2";
     public static final String REPORT_2 = "report2";
     public static final String USER_2 = "user2";
-    public static final String URLCSV_2 = "urlcsv2";
-    public static final String URLPDF_2 = "urlpdf2";
+
 
     @InjectMocks
     private ReportController reportController;
@@ -62,16 +60,12 @@ public class ControllerTest {
         report1.setId(ID_1);
         report1.setTitle(REPORT_1);
         report1.setUserEmail(USER_1);
-        report1.setDownloadUrlCsv(URLCSV_1);
-        report1.setDownloadUrlPdf(URLPDF_1);
         report1.setContent(MOCK_BYTE_ARRAY_RESULT);
         report1.setCreationDate(null);
         Report report2 = new Report();
         report2.setId(ID_2);
         report2.setTitle(REPORT_2);
         report2.setUserEmail(USER_2);
-        report2.setDownloadUrlCsv(URLCSV_2);
-        report2.setDownloadUrlPdf(URLPDF_2);
         report2.setContent(MOCK_BYTE_ARRAY_RESULT);
         report2.setCreationDate(null);
         return List.of(report1, report2);
@@ -114,7 +108,7 @@ public class ControllerTest {
     }
 
     @Test
-    void whenGetAllReports_thenReturnAll2Reports() {
+    void whenGetAllReports_thenReturnAll2Reports() throws InvalidObject {
         when(reportInPort.getAllReports()).thenReturn(mockListReports());
         ResponseEntity<List<Report>> result = reportController.getAllReports();
         assertEquals(mockListReports(), result.getBody());

@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ad
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
@@ -36,7 +37,7 @@ public class UserOutAdapter implements UserOutPort {
       
         UserEntity userByEmail = userRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException(MessageException.USER_ENTITY_NOT_FOUND));
         return UserPersistenceMapper.userEntityToUser(userByEmail);
     }
 
@@ -48,7 +49,7 @@ public class UserOutAdapter implements UserOutPort {
       
         UserEntity userByUsername = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException(MessageException.USER_ENTITY_NOT_FOUND));
         return UserPersistenceMapper.userEntityToUser(userByUsername);
     }
 
@@ -59,7 +60,7 @@ public class UserOutAdapter implements UserOutPort {
       
         UserEntity userById = userRepository
                 .findById(id)
-                .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEntityNotFoundException(MessageException.USER_ENTITY_NOT_FOUND));
         return UserPersistenceMapper.userEntityToUser(userById);
     }
 
@@ -105,13 +106,13 @@ public class UserOutAdapter implements UserOutPort {
 
     private static void validateNullParams(Object... params) {
         if (PersistanceValidation.isNull(params)) {
-            throw new IllegalArgumentException("Params cannot be null");
+            throw new IllegalArgumentException(MessageException.INVALID_USER_MODEL);
         }
     }
 
     private void validateUserExist(Long id) throws UserEntityNotFoundException {
         if (userIsNotFoundById(id)) {
-            throw new UserEntityNotFoundException("User not found");
+            throw new UserEntityNotFoundException(MessageException.USER_ENTITY_NOT_FOUND);
         }
     }
 

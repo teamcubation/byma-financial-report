@@ -2,6 +2,7 @@ package com.teamcubation.reportservice.application.service;
 
 import com.teamcubation.reportservice.domain.model.user.UserAuthenticated;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //ahora se hardcodea el user admin en el registro del authService
 
         //este llamado a userRepostory podria ser un call al servicio de autenticacion
-        UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserEntity userFromDb = userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UsernameNotFoundException(MessageException.USER_NOT_FOUND));
         List<GrantedAuthority> authoritiesFromDb = List.of(new SimpleGrantedAuthority("ROLE_" + userFromDb.getRole().name()));
 
         return new UserAuthenticated(userFromDb, authoritiesFromDb);

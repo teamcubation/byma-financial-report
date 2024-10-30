@@ -1,15 +1,16 @@
 package com.teamcubation.reportservice.application.port.in;
 
 import com.teamcubation.reportservice.domain.model.report.Report;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface ReportInPort {
-    byte[] generateFile(String typeFile, String typeInstrument) throws IOException;
+    byte[] generateFile(String typeFile, String typeInstrument) throws IOException, InvalidObject;
     byte[] generatePdf(String typeInstrument) throws IOException;
     byte[] generateCsv(String typeInstrument) throws IOException;
     byte[] downloadFile(String id) throws IOException;
-    List<Report> getAllReports();
-    List<Report> findByUserEmail();
+    List<Report> getAllReports() throws InvalidObject;
+    List<Report> findByUserEmail() throws InvalidObject;
 }

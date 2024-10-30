@@ -6,6 +6,7 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.exceptionHandler.GlobalExceptionHandler;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -43,6 +46,7 @@ class UserControllerTest {
     private static final String PASSWORD_3 = "password_3";
     private static final String ROLE_1 = "USER";
     private static final long ID_NONEXISTENT = 8L;
+    private static final String BASE_URL = "/api/users/";
 
     @InjectMocks
     private UserController userController;
@@ -99,10 +103,9 @@ class UserControllerTest {
 
         when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenReturn(userCreate);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isCreated())
@@ -112,33 +115,45 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldReturnStatusCode409_whenUserToCreateAlreadyExists() throws Exception {
-        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException("User Duplicated"));
+    void shouldReturnStatusCode409_whenUserToCreateHasADuplicatedName() throws Exception {
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User Duplicated"));
+                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_USERNAME_USER));
+    }
+
+    @Test
+    void shouldReturnStatusCode409_whenUserToCreateHasADuplicatedEmail() throws Exception {
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER));
+
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
+
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_EMAIL_USER));
     }
 
     @Test
     void shouldReturnAllUsersSuccessAndHasSize3_whenGetAll() throws Exception {
         when(userInPort.getAll()).thenReturn(users);
 
-        this.mockMvc.perform(get("/api/users"))
+        this.mockMvc.perform(get(BASE_URL))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(3)));
     }
 
     @Test
     void shouldReturnAndEmptyList_whenGetAllAndThereIsNotUsers() throws Exception {
-        when(userInPort.getAll()).thenReturn(new ArrayList<>());
+        when(userInPort.getAll()).thenReturn(Collections.emptyList());
 
-        this.mockMvc.perform(get("/api/users"))
+        this.mockMvc.perform(get(BASE_URL))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(0)));
     }
@@ -147,10 +162,9 @@ class UserControllerTest {
     void shouldReturnBadRequest_whenCreateUserWithNameNull() throws Exception {
         userRequest.setUsername(null);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isBadRequest());
@@ -160,10 +174,9 @@ class UserControllerTest {
     void shouldReturnBadRequest_whenwhenCreateUserEmailNull() throws Exception {
         userRequest.setEmail(null);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isBadRequest());
@@ -173,10 +186,9 @@ class UserControllerTest {
     void shouldReturnBadRequest_whenCreateUserWithPasswordNull() throws Exception {
         userRequest.setPassword(null);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isBadRequest());
@@ -186,10 +198,9 @@ class UserControllerTest {
     void shouldReturnBadRequest_whenCreateUserWithRoleNull() throws Exception {
         userRequest.setRole(null);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(post("/api/users/")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isBadRequest());
@@ -199,7 +210,7 @@ class UserControllerTest {
     void shouldReturnAUserSuccess_whenGetUserById() throws Exception {
         when(userInPort.findById(ID_1)).thenReturn(users.get(0));
 
-        mockMvc.perform(get("/api/users/{id}", ID_1))
+        mockMvc.perform(get(BASE_URL + "{id}", ID_1))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.username").value(NAME_1))
                 .andExpect(jsonPath("$.email").value(EMAIL_1))
@@ -208,28 +219,28 @@ class UserControllerTest {
 
     @Test
     void shouldReturnStatusCode409_whenGetUserByIdIsNotFound() throws Exception {
-        when(userInPort.findById(ID_1)).thenThrow(new UserNotFoundException("User not found"));
+        when(userInPort.findById(ID_1)).thenThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND));
 
-        mockMvc.perform(get("/api/users/{id}", ID_1))
+        mockMvc.perform(get(BASE_URL + "{id}", ID_1))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
     }
 
     @Test
     void shouldReturnStatusCode204_whenDeleteUserByIdIsSuccess() throws Exception {
         doNothing().when(userInPort).delete(ID_1);
 
-        mockMvc.perform(delete("/api/users/{id}", ID_1))
+        mockMvc.perform(delete(BASE_URL + "{id}", ID_1))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldReturnStatusCode409_whenDeleteUserByIdIsNotFound() throws Exception {
-        doThrow(new UserNotFoundException("User not found")).when(userInPort).delete(ID_1);
+        doThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND)).when(userInPort).delete(ID_1);
 
-        mockMvc.perform(delete("/api/users/{id}", ID_1))
+        mockMvc.perform(delete(BASE_URL + "{id}", ID_1))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
     }
 
     @Test
@@ -244,10 +255,9 @@ class UserControllerTest {
         User userToUpdate = UserMapper.userRequestToUser(ID_1, userRequestToUpdate);
         when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdate))).thenReturn(userToUpdate);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequestToUpdate);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequestToUpdate);
 
-        mockMvc.perform(put("/api/users/{id}", ID_1)
+        mockMvc.perform(put(BASE_URL + "{id}", ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
                 .andExpect(status().is2xxSuccessful())
@@ -265,16 +275,16 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameName))).thenThrow(new UserDuplicateException("User Duplicated"));
+        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameName)))
+                .thenThrow(new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequestToUpdateWithSameName);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequestToUpdateWithSameName);
 
-        mockMvc.perform(put("/api/users/{id}", ID_1)
+        mockMvc.perform(put(BASE_URL + "{id}", ID_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User Duplicated"));
+                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_USERNAME_USER));
     }
 
     @Test
@@ -286,29 +296,27 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException("User Duplicated"));
+        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequestToUpdateWithSameEmail);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequestToUpdateWithSameEmail);
 
-        mockMvc.perform(put("/api/users/{id}", ID_1)
+        mockMvc.perform(put(BASE_URL + "{id}", ID_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User Duplicated"));
+                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_EMAIL_USER));
     }
 
     @Test
     void shouldReturnStatusCode409_whenUpdateUserIsNotFound() throws Exception {
-        when(userInPort.update(UserMapper.userRequestToUser(ID_NONEXISTENT, userRequest))).thenThrow(new UserNotFoundException("User not found"));
+        when(userInPort.update(UserMapper.userRequestToUser(ID_NONEXISTENT, userRequest))).thenThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(userRequest);
+        String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
-        mockMvc.perform(put("/api/users/{id}", ID_NONEXISTENT)
+        mockMvc.perform(put(BASE_URL + "{id}", ID_NONEXISTENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
     }
 }

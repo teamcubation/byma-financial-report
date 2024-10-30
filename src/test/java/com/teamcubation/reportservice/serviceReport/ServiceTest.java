@@ -11,6 +11,7 @@ import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +39,6 @@ public class ServiceTest {
     public static final String STOCKS = "stocks";
     public static final String CSV = "csv";
     public static final String PDF = "pdf";
-    public static final String URLCSV = "urlcsv";
-    public static final String URLPDF = "urlpdf";
     public static final String REPORT_A = "ReportA";
     public static final String ID_1 = "1";
     public static final String REPORT_B = "ReportB";
@@ -90,8 +89,6 @@ public class ServiceTest {
         reportB.setTitle(REPORT_B);
         reportB.setUserEmail(TEST_GMAIL);
         reportB.setCreationDate(LocalDateTime.now());
-        reportB.setDownloadUrlPdf(URLPDF);
-        reportB.setDownloadUrlCsv(URLCSV);
         reportB.setContent(new byte[]{});
         return reportB;
     }
@@ -101,13 +98,11 @@ public class ServiceTest {
         reportA.setTitle(REPORT_A);
         reportA.setUserEmail(TEST_GMAIL);
         reportA.setCreationDate(LocalDateTime.now());
-        reportA.setDownloadUrlPdf(URLPDF);
-        reportA.setDownloadUrlCsv(URLCSV);
         reportA.setContent(new byte[]{});
         return reportA;
     }
     @Test
-    void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException {
+    void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException, InvalidObject {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
@@ -118,7 +113,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException {
+    void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException, InvalidObject {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
@@ -206,7 +201,7 @@ public class ServiceTest {
     }
 
     @Test
-    void whenGetAllReports_returnNoDataReportTest() {
+    void whenGetAllReports_returnNoDataReportTest() throws InvalidObject {
         List<ReportEntity> reportList = new ArrayList<>();
         when(reportOutPort.getAll()).thenReturn(reportList);
         List<Report> result = reportService.getAllReports();
@@ -215,7 +210,7 @@ public class ServiceTest {
 
 
     @Test
-    void whenGetAllReports_return2ReportsTest() {
+    void whenGetAllReports_return2ReportsTest() throws InvalidObject {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
@@ -233,7 +228,7 @@ public class ServiceTest {
 
 
     @Test
-    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest(){
+    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest() throws InvalidObject {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
@@ -244,7 +239,7 @@ public class ServiceTest {
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportA));
         reportList.add(ReportPersistenceMapper.reportModelToReportEntity(reportB));
         when(reportOutPort.findByUserEmail(TEST_GMAIL)).thenReturn(reportList);
-        List<Report> result = reportService.findByUserEmail(TEST_GMAIL);
+        List<Report> result = reportService.findByUserEmail();
         assertEquals(result.size(), reportList.size());
     }
 }

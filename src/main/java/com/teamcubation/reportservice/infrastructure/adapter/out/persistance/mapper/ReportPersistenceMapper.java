@@ -2,13 +2,14 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ma
 
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.util.validation.PersistenceValidation;
 
 import java.time.LocalDateTime;
 
 public class ReportPersistenceMapper {
 
-    public static Report reportEntityToReportModel(ReportEntity reportEntity){
+    public static Report reportEntityToReportModel(ReportEntity reportEntity) throws InvalidObject {
         PersistenceValidation.validateObjetNotNull(reportEntity);
         return Report.builder()
                 .id(reportEntity.getId())
@@ -21,7 +22,7 @@ public class ReportPersistenceMapper {
 
     }
 
-    public static ReportEntity reportModelToReportEntity(Report report){
+    public static ReportEntity reportModelToReportEntity(Report report) throws InvalidObject {
         PersistenceValidation.validateObjetNotNull(report);
         return ReportEntity.builder()
                 .id(report.getId())
