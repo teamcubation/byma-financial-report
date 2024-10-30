@@ -7,6 +7,7 @@ import com.teamcubation.reportservice.application.service.generatorfile.Generato
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
@@ -39,8 +40,6 @@ public class ServiceTest {
     public static final String STOCKS = "stocks";
     public static final String CSV = "csv";
     public static final String PDF = "pdf";
-    public static final String URLCSV = "urlcsv";
-    public static final String URLPDF = "urlpdf";
     public static final String REPORT_A = "ReportA";
     public static final String ID_1 = "1";
     public static final String REPORT_B = "ReportB";
@@ -249,5 +248,18 @@ public class ServiceTest {
         when(reportOutPort.findByUserEmail(TEST_GMAIL)).thenReturn(reportList);
         List<Report> result = reportService.findByUserEmail();
         assertEquals(result.size(), reportList.size());
+    }
+    @Test
+    void whenDownloadFileWithValidId_thenReturnFileTest() {
+        Report reportA = mockReportA();
+        reportOutPort.save(reportA);
+        String id = reportA.getId();
+        when(reportOutPort.findById(id)).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(reportA));
+        byte[] result = reportService.downloadFile(id);
+        assertEquals(reportA.getContent(), result);
+    }
+    @Test
+    void whenDownloadFileWithInvalidId_thenReturnInvalidIdExceptionTest() {
+        assertThrows(ReportNotFoundException.class, () -> reportService.downloadFile(INVALID));
     }
 }
