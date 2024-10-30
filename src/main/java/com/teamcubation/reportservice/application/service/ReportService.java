@@ -8,6 +8,7 @@ import com.teamcubation.reportservice.application.service.generatorfile.Generato
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
@@ -89,48 +90,43 @@ public class ReportService implements ReportInPort {
         savedReport.setDownloadUrl(downloadUrls);
         log.info("Report created successfully with ID: {}", savedReport.getId());
         return save(savedReport);
-
     }
 
-    public byte[] downloadFile(String id) throws IOException {
+    public byte[] downloadFile(String id) {
         ReportEntity reportEntity = reportOutPort.findById(id);
         if (reportEntity == null) {
-            log.warn(REPORT_NOT_FOUND);
-            throw new RuntimeException(REPORT_NOT_FOUND);
+            log.error(REPORT_NOT_FOUND);
+            throw new ReportNotFoundException(REPORT_NOT_FOUND);
         }
         return reportEntity.getContent();
     }
 
     public byte[] generatePdf(String typeInstrument) throws IOException {
         log.info("Fetching all bonds and stocks for PDF generation.");
-        if (typeInstrument == null) {
-            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
-        if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
-        }
-        if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
-        }
-        log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
-        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        return switch (typeInstrument) {
+            case null ->
+                    GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+            case BONDS_TYPE -> GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
+            case STOCKS_TYPE -> GeneratorPdf.generatePdfContent(null, connectionOutPort.getAllStocks());
+            default -> {
+                log.error(INSTRUMENT_TYPE_NOT_SUPPORTED);
+                throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+            }
+        };
     }
 
-   
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
         log.info("Fetching all stocks and stocks for PDF generation.");
-        if (typeInstrument == null) {
-            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
-        if (typeInstrument.equals(BONDS_TYPE)) {
-            return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
-        }
-        if (typeInstrument.equals(STOCKS_TYPE)) {
-            return GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
-        }
-        log.warn(INSTRUMENT_TYPE_NOT_SUPPORTED);
-        throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+        return switch (typeInstrument) {
+            case null -> GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
+            case BONDS_TYPE -> GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
+            case STOCKS_TYPE -> GeneratorCsv.generateCsv(null, connectionOutPort.getAllStocks());
+            default -> {
+                log.error(INSTRUMENT_TYPE_NOT_SUPPORTED);
+                throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
+            }
+        };
     }
 
     public List<Report> findByUserEmail() {
@@ -157,7 +153,6 @@ public class ReportService implements ReportInPort {
 
     @CacheEvict(value = "reportsCache", key = "#userEmail")
     public Report save(Report report) {
-        String userEmail = getAuthenticatedUserEmail();
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }
 }
