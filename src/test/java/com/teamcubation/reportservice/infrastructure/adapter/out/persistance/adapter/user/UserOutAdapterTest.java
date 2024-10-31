@@ -1,14 +1,8 @@
 package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
-
-import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
-import com.teamcubation.reportservice.domain.model.user.UserRole;
-import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
-import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -26,224 +19,231 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class UserOutAdapterTest {
 
+    private static final Long USER_ID = 1L;
+    private static final String USERNAME = "testUser";
+    private static final String EMAIL = "test@example.com";
+    private static final String PASSWORD = "password";
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
+    private static final String PARAMS_CANNOT_BE_NULL_MESSAGE = "Params cannot be null";
+    private static final String NON_EXISTENT_EMAIL = "nonexistent@example.com";
+    private static final String NON_EXISTENT_USERNAME = "nonexistentUser";
+
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @InjectMocks
-    UserOutAdapter userOutAdapter;
+    private UserOutAdapter userOutAdapter;
 
-    private UserRequest mockedUserRequest;
-
-    private String mockedEmailRequest;
-
-    private String mockedUsernameRequest;
-
-    private Long mockedUserIdRequest;
-
-    private List<UserEntity> mockedUserEntitiesFromDb;
+    private User user;
+    private UserEntity userEntity;
 
     @BeforeEach
     public void setUp() {
-        mockedUserRequest = UserRequest.builder()
-                .username("username")
-                .email("email")
-                .password("password")
-                .role("ROLE_ADMIN")
+        user = User.builder()
+                .id(USER_ID)
+                .username(USERNAME)
+                .email(EMAIL)
+                .password(PASSWORD)
+                .roles(new HashSet<>())
                 .build();
 
-        mockedEmailRequest = "test@gmail.com";
-
-        mockedUsernameRequest = "username";
-
-        mockedUserIdRequest = 1L;
-
-        mockedUserEntitiesFromDb = List.of(
-                UserEntity.builder()
-                        .id(1L)
-                        .username("Juan")
-                        .email("test@gmail.com")
-                        .password("password")
-                        .role(UserRole.ADMIN)
-                        .build(),
-                UserEntity.builder()
-                        .id(2L)
-                        .username("Pepe")
-                        .email("test2@gmail.com")
-                        .password("password")
-                        .role(UserRole.ADMIN)
-                        .build(),
-                UserEntity.builder()
-                        .id(3L)
-                        .username("Jhon")
-                        .email("test3@gmail.com")
-                        .password("password")
-                        .role(UserRole.ADMIN)
-                        .build()
-        );
-
+        userEntity = UserEntity.builder()
+                .id(USER_ID)
+                .username(USERNAME)
+                .email(EMAIL)
+                .password(PASSWORD)
+                .roles(new HashSet<>())
+                .build();
     }
 
     @Test
-    public void shouldRegisterUser_whenValidUserIsProvided_thenReturnPersistedUser() throws UserEntityNotFoundException, UserNotFoundException, InvalidUserModel {
-        UserEntity expectedUserEntity = UserEntity.builder()
-                .id(1L)
-                .username("username")
-                .email("test@gmail.com")
-                .password("password")
-                .role(UserRole.ADMIN)
-                .build();
-        User userFromRequest = UserMapper.userRequestToUser(null, mockedUserRequest);
+    public void registerUser_shouldReturnUser_whenUserIsRegistered() throws UserEntityNotFoundException, UserNotFoundException {
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
-        when(userRepository.save(UserPersistenceMapper.userToUserEntity(userFromRequest))).thenReturn(expectedUserEntity);
+        User result = userOutAdapter.registerUser(user);
 
-        User user = userOutAdapter.registerUser(userFromRequest);
-
-        assertNotNull(user);
-        assertEquals(expectedUserEntity.getId(), user.getId());
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername());
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail());
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertNotNull(result);
+        assertEquals(USERNAME, result.getUsername());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
     @Test
-    void shouldFindByEmail_whenValidEmailIsProvided_thenReturnPersistedUser() throws Exception {
-        UserEntity expectedUserEntity = UserEntity.builder()
-                .id(1L)
-                .username("username")
-                .email("test@gmail.com")
-                .password("password")
-                .role(UserRole.ADMIN)
-                .build();
+    public void registerUser_shouldThrowException_whenUserIsNull() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userOutAdapter.registerUser(null);
+        });
 
-        when(userRepository.findByEmailIgnoreCase(mockedEmailRequest)).thenReturn(Optional.of(expectedUserEntity));
-
-        User user = userOutAdapter.findByEmailIgnoreCase(mockedEmailRequest);
-
-        assertNotNull(user, "User should not be null");
-        assertEquals(expectedUserEntity.getId(), user.getId(), "Id should be equal");
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername(), "Username should be equal");
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail(), "Email should be equal");
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword(), "Password should be equal");
-        assertEquals(expectedUserEntity.getRole(), user.getRole(), "Role should be equal");
+        assertEquals(PARAMS_CANNOT_BE_NULL_MESSAGE, exception.getMessage());
     }
 
     @Test
-    void shouldFindByUsername_whenValidUsernameIsProvided_thenReturnPersistedUser() throws Exception {
-        UserEntity expectedUserEntity = UserEntity.builder()
-                .id(1L)
-                .username("username")
-                .email("test@gmail.com")
-                .password("password")
-                .role(UserRole.ADMIN)
-                .build();
+    public void findByEmailIgnoreCase_shouldReturnUser_whenUserExists() throws UserEntityNotFoundException, UserNotFoundException {
+        when(userRepository.findByEmailIgnoreCase(EMAIL)).thenReturn(Optional.of(userEntity));
 
-        when(userRepository.findByUsername(mockedUsernameRequest)).thenReturn(Optional.of(expectedUserEntity));
+        User result = userOutAdapter.findByEmailIgnoreCase(EMAIL);
 
-        User user = userOutAdapter.findByUsername(mockedUsernameRequest);
-
-        assertNotNull(user, "User should not be null");
-        assertEquals(expectedUserEntity.getId(), user.getId(), "Id should be equal");
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername(), "Username should be equal");
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail(), "Email should be equal");
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword(), "Password should be equal");
-        assertEquals(expectedUserEntity.getRole(), user.getRole(), "Role should be equal");
+        assertNotNull(result);
+        assertEquals(USERNAME, result.getUsername());
+        verify(userRepository, times(1)).findByEmailIgnoreCase(EMAIL);
     }
 
     @Test
-    void shouldFindById_whenValidIdIsProvided_thenReturnPersistedUser() throws Exception {
-        UserEntity expectedUserEntity = UserEntity.builder()
-                .id(1L)
-                .username("username")
-                .email("test@gmail.com")
-                .password("password")
-                .role(UserRole.ADMIN)
-                .build();
+    public void findByEmailIgnoreCase_shouldThrowException_whenUserDoesNotExist() {
+        when(userRepository.findByEmailIgnoreCase(EMAIL)).thenReturn(Optional.empty());
 
-        when(userRepository.findById(mockedUserIdRequest)).thenReturn(Optional.of(expectedUserEntity));
+        Exception exception = assertThrows(UserEntityNotFoundException.class, () -> {
+            userOutAdapter.findByEmailIgnoreCase(EMAIL);
+        });
 
-        User user = userOutAdapter.findById(mockedUserIdRequest);
-
-        assertNotNull(user, "User should not be null");
-        assertEquals(expectedUserEntity.getId(), user.getId(), "Id should be equal");
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername(), "Username should be equal");
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail(), "Email should be equal");
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword(), "Password should be equal");
-        assertEquals(expectedUserEntity.getRole(), user.getRole(), "Role should be equal");
+        assertEquals(USER_NOT_FOUND_MESSAGE, exception.getMessage());
     }
 
     @Test
-    void shouldFindAll_whenNoParamsAreProvided_thenReturnAllPersistedUsers() throws UserNotFoundException {
+    public void findByUsername_shouldReturnUser_whenUserExists() throws UserNotFoundException, UserEntityNotFoundException {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(userEntity));
 
-        List<User> expectedUsers = mockedUserEntitiesFromDb.stream()
-                .map(userEntity -> {
-                    try{
-                        return UserPersistenceMapper.userEntityToUser(userEntity);
-                    } catch (UserNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
+        User result = userOutAdapter.findByUsername(USERNAME);
 
-        when(userRepository.findAll()).thenReturn(mockedUserEntitiesFromDb);
+        assertNotNull(result);
+        assertEquals(USERNAME, result.getUsername());
+        verify(userRepository, times(1)).findByUsername(USERNAME);
+    }
 
-        List<User> users = userOutAdapter.getAll();
+    @Test
+    public void findByUsername_shouldThrowException_whenUserDoesNotExist() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.empty());
 
-        assertNotNull(users);
-        assertEquals(3, users.size(), "Size should be equal to 3");
-        assertEquals(expectedUsers, users, "Users should be equal");
-        assertEquals(expectedUsers.get(0), users.get(0), "Users should be equal");
-        assertEquals(expectedUsers.get(1), users.get(1), "Users should be equal");
-        assertEquals(expectedUsers.get(2), users.get(2), "Users should be equal");
+        Exception exception = assertThrows(UserEntityNotFoundException.class, () -> {
+            userOutAdapter.findByUsername(USERNAME);
+        });
 
+        assertEquals(USER_NOT_FOUND_MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void findById_shouldReturnUser_whenUserExists() throws UserNotFoundException, UserEntityNotFoundException {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(userEntity));
+
+        User result = userOutAdapter.findById(USER_ID);
+
+        assertNotNull(result);
+        assertEquals(USERNAME, result.getUsername());
+        verify(userRepository, times(1)).findById(USER_ID);
+    }
+
+    @Test
+    public void findById_shouldThrowException_whenUserDoesNotExist() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UserEntityNotFoundException.class, () -> {
+            userOutAdapter.findById(USER_ID);
+        });
+
+        assertEquals(USER_NOT_FOUND_MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void getAll_shouldReturnListOfUsers_whenUsersExist() throws UserNotFoundException {
+        List<UserEntity> userEntities = new ArrayList<>();
+        userEntities.add(userEntity);
+        when(userRepository.findAll()).thenReturn(userEntities);
+
+        List<User> result = userOutAdapter.getAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(USERNAME, result.get(0).getUsername());
         verify(userRepository, times(1)).findAll();
     }
 
     @Test
-    void shouldUpdateUser_whenValidUserRequestIsProvided_thenReturnPersistedUser() throws UserEntityNotFoundException, UserNotFoundException, InvalidUserModel {
-        UserEntity expectedUserEntity = UserEntity.builder()
-                .id(1L)
-                .username("username")
-                .email("test@gmail.com")
-                .password("password")
-                .role(UserRole.ADMIN)
-                .build();
+    public void getAll_shouldReturnEmptyList_whenNoUsersExist() throws UserNotFoundException {
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
 
+        List<User> result = userOutAdapter.getAll();
 
-
-        User userFromRequest = UserMapper.userRequestToUser(null, mockedUserRequest);
-        userFromRequest.setId(mockedUserIdRequest);
-
-        when(userRepository.save(UserPersistenceMapper.userToUserEntity(userFromRequest))).thenReturn(expectedUserEntity);
-
-        User user = userOutAdapter.updateUser(userFromRequest);
-
-        assertNotNull(user);
-        assertEquals(expectedUserEntity.getId(), user.getId());
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername());
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail());
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
-
-        verify(userRepository, times(1)).save(UserPersistenceMapper.userToUserEntity(userFromRequest));
-
-
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(userRepository, times(1)).findAll();
     }
 
     @Test
-    void shouldThrowIllegalArgumentException_whenInvalidUserRequestIsProvided() {
-        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.updateUser(null));
+    public void updateUser_shouldReturnUpdatedUser_whenUserIsUpdated() throws UserNotFoundException, UserEntityNotFoundException {
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+
+        User result = userOutAdapter.updateUser(user);
+
+        assertNotNull(result);
+        assertEquals(USERNAME, result.getUsername());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
-
-
     @Test
-    void shouldThrowUserEntityNotFoundException_whenInvalidIdIsProvided() {
-        assertThrows(UserEntityNotFoundException.class, () -> userOutAdapter.deleteUserById(-1L));
+    public void updateUser_shouldThrowException_whenUserIsNull() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userOutAdapter.updateUser(null);
+        });
+
+        assertEquals(PARAMS_CANNOT_BE_NULL_MESSAGE, exception.getMessage());
     }
 
     @Test
-    void shouldThrowIllegalArgumentException_whenInvalidIdIsProvided() {
-        assertThrows(IllegalArgumentException.class, () -> userOutAdapter.deleteUserById(null));
+    public void deleteUserById_shouldDeleteUser_whenUserExists() throws UserEntityNotFoundException {
+        when(userRepository.existsById(USER_ID)).thenReturn(true);
+
+        userOutAdapter.deleteUserById(USER_ID);
+
+        verify(userRepository, times(1)).deleteById(USER_ID);
+    }
+
+    @Test
+    public void deleteUserById_shouldThrowException_whenUserDoesNotExist() {
+        when(userRepository.existsById(USER_ID)).thenReturn(false);
+
+        Exception exception = assertThrows(UserEntityNotFoundException.class, () -> {
+            userOutAdapter.deleteUserById(USER_ID);
+        });
+
+        assertEquals(USER_NOT_FOUND_MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void existsByEmailIgnoreCase_shouldReturnTrue_whenEmailExists() {
+        when(userRepository.existsByEmailIgnoreCase(EMAIL)).thenReturn(true);
+
+        boolean exists = userOutAdapter.existsByEmailIgnoreCase(EMAIL);
+
+        assertTrue(exists);
+        verify(userRepository, times(1)).existsByEmailIgnoreCase(EMAIL);
+    }
+
+    @Test
+    public void existsByEmailIgnoreCase_shouldReturnFalse_whenEmailDoesNotExist() {
+        when(userRepository.existsByEmailIgnoreCase(NON_EXISTENT_EMAIL)).thenReturn(false);
+
+        boolean exists = userOutAdapter.existsByEmailIgnoreCase(NON_EXISTENT_EMAIL);
+
+        assertFalse(exists);
+        verify(userRepository, times(1)).existsByEmailIgnoreCase(NON_EXISTENT_EMAIL);
+    }
+
+    @Test
+    public void existsByNameIgnoreCase_shouldReturnTrue_whenUsernameExists() {
+        when(userRepository.existsByUsernameIgnoreCase(USERNAME)).thenReturn(true);
+
+        boolean exists = userOutAdapter.existsByNameIgnoreCase(USERNAME);
+
+        assertTrue(exists);
+        verify(userRepository, times(1)).existsByUsernameIgnoreCase(USERNAME);
+    }
+
+    @Test
+    public void existsByNameIgnoreCase_shouldReturnFalse_whenUsernameDoesNotExist() {
+        when(userRepository.existsByUsernameIgnoreCase(NON_EXISTENT_USERNAME)).thenReturn(false);
+
+        boolean exists = userOutAdapter.existsByNameIgnoreCase(NON_EXISTENT_USERNAME);
+
+        assertFalse(exists);
+        verify(userRepository, times(1)).existsByUsernameIgnoreCase(NON_EXISTENT_USERNAME);
     }
 }
