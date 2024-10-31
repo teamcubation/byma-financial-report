@@ -251,7 +251,7 @@ public class ServiceTest {
         assertEquals(result.size(), reportList.size());
     }
     @Test
-    void whenDownloadFileWithValidId_thenReturnFileTest() {
+    void whenDownloadFileWithValidId_thenReturnFileTest() throws InvalidObject {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
         String id = reportA.getId();

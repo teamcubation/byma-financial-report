@@ -14,13 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
+import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static com.teamcubation.reportservice.domain.model.user.UserRole.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -60,6 +61,8 @@ class UserControllerTest {
 
     private  UserRequest userRequest;
 
+    private Set<String> role_Request = new HashSet<>();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -67,32 +70,52 @@ class UserControllerTest {
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
+        Set<Role> role_1 = new HashSet<>();
+        role_1.add(Role.builder()
+                .id(ID_1)
+                .role(USER)
+                .build());
+
+        Set<Role> role_2 = new HashSet<>();
+        role_1.add(Role.builder()
+                .id(ID_2)
+                .role(USER)
+                .build());
+
+        Set<Role> role_3 = new HashSet<>();
+        role_1.add(Role.builder()
+                .id(ID_3)
+                .role(USER)
+                .build());
+
         users.add(User.builder()
                 .id(ID_1)
                 .email(EMAIL_1)
                 .username(NAME_1)
-                .role(UserRole.USER)
+                .roles(role_1)
                 .password(PASSWORD_1)
                 .build());
         users.add(User.builder()
                 .id(ID_2)
                 .email(EMAIL_2)
                 .username(NAME_2)
-                .role(UserRole.USER)
+                .roles(role_2)
                 .password(PASSWORD_2)
                 .build());
         users.add(User.builder()
                 .id(ID_3)
                 .email(EMAIL_3)
                 .username(NAME_3)
-                .role(UserRole.USER)
+                .roles(role_3)
                 .password(PASSWORD_3)
                 .build());
+
+        role_Request.add(UserRole.USER.toString());
 
         userRequest = UserRequest.builder()
                 .email(EMAIL_1)
                 .username(NAME_1)
-                .role(ROLE_1)
+                .roles(role_Request)
                 .password(PASSWORD_1)
                 .build();
     }
@@ -196,7 +219,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnBadRequest_whenCreateUserWithRoleNull() throws Exception {
-        userRequest.setRole(null);
+        userRequest.setRoles(Collections.emptySet());
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
@@ -248,7 +271,7 @@ class UserControllerTest {
         UserRequest userRequestToUpdate = UserRequest.builder()
                 .email(EMAIL_2)
                 .username(NAME_2)
-                .role(ROLE_1)
+                .roles(role_Request)
                 .password(PASSWORD_2)
                 .build();
 
@@ -271,7 +294,7 @@ class UserControllerTest {
         UserRequest userRequestToUpdateWithSameName = UserRequest.builder()
                 .email(EMAIL_2)
                 .username("duplicated name")
-                .role(ROLE_1)
+                .roles(role_Request)
                 .password(PASSWORD_2)
                 .build();
 
@@ -292,7 +315,7 @@ class UserControllerTest {
         UserRequest userRequestToUpdateWithSameEmail = UserRequest.builder()
                 .email("duplicated email")
                 .username(NAME_2)
-                .role(ROLE_1)
+                .roles(role_Request)
                 .password(PASSWORD_2)
                 .build();
 

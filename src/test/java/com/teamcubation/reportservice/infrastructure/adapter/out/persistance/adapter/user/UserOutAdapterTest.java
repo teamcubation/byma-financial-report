@@ -2,12 +2,14 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ad
 
 import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.role.RoleEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static com.teamcubation.reportservice.domain.model.user.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -59,13 +60,17 @@ public class UserOutAdapterTest {
 
     private UserEntity expectedUserEntity;
 
+    private Set<String> role_Request = new HashSet<>();
+
     @BeforeEach
     public void setUp() {
+        role_Request.add(UserRole.USER.toString());
+
         mockedUserRequest = UserRequest.builder()
                 .username(USERNAME_1)
                 .email(EMAIL_1)
                 .password(PASSWORD_1)
-                .role(UserRole.ADMIN.toString())
+                .roles(role_Request)
                 .build();
 
         mockedEmailRequest = EMAIL_2;
@@ -74,27 +79,45 @@ public class UserOutAdapterTest {
 
         mockedUserIdRequest = ID_1;
 
+        Set<RoleEntity> role_Entity_Request_1 = new HashSet<>();
+        role_Entity_Request_1.add(RoleEntity.builder()
+                .id(ID_1)
+                .role(USER)
+                .build());
+
+        Set<RoleEntity> role_Entity_Request_2 = new HashSet<>();
+        role_Entity_Request_2.add(RoleEntity.builder()
+                .id(ID_2)
+                .role(USER)
+                .build());
+
+        Set<RoleEntity> role_Entity_Request_3 = new HashSet<>();
+        role_Entity_Request_3.add(RoleEntity.builder()
+                .id(ID_3)
+                .role(USER)
+                .build());
+
         mockedUserEntitiesFromDb = List.of(
                 UserEntity.builder()
                         .id(ID_1)
                         .username(USERNAME_1)
                         .email(EMAIL_1)
                         .password(PASSWORD_1)
-                        .role(UserRole.ADMIN)
+                        .roles(role_Entity_Request_1)
                         .build(),
                 UserEntity.builder()
                         .id(ID_2)
                         .username(USERNAME_2)
                         .email(EMAIL_2)
                         .password(PASSWORD_2)
-                        .role(UserRole.ADMIN)
+                        .roles(role_Entity_Request_2)
                         .build(),
                 UserEntity.builder()
                         .id(ID_3)
                         .username(USERNAME_3)
                         .email(EMAIL_3)
                         .password(PASSWORD_3)
-                        .role(UserRole.ADMIN)
+                        .roles(role_Entity_Request_3)
                         .build()
         );
 
@@ -103,7 +126,7 @@ public class UserOutAdapterTest {
                 .username(USERNAME_1)
                 .email(EMAIL_1)
                 .password(PASSWORD_1)
-                .role(UserRole.ADMIN)
+                .roles(role_Entity_Request_1)
                 .build();
 
     }
@@ -117,12 +140,14 @@ public class UserOutAdapterTest {
 
         User user = userOutAdapter.registerUser(userFromRequest);
 
+        UserEntity userActual = UserPersistenceMapper.userToUserEntity(user);
+
         assertNotNull(user);
-        assertEquals(expectedUserEntity.getId(), user.getId());
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername());
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail());
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertEquals(expectedUserEntity.getId(), userActual.getId());
+        assertEquals(expectedUserEntity.getUsername(), userActual.getUsername());
+        assertEquals(expectedUserEntity.getEmail(), userActual.getEmail());
+        assertEquals(expectedUserEntity.getPassword(), userActual.getPassword());
+        assertEquals(expectedUserEntity.getRoles(), userActual.getRoles());
     }
 
     @Test
@@ -130,13 +155,14 @@ public class UserOutAdapterTest {
         when(userRepository.findByEmailIgnoreCase(mockedEmailRequest)).thenReturn(Optional.of(expectedUserEntity));
 
         User user = userOutAdapter.findByEmailIgnoreCase(mockedEmailRequest);
+        UserEntity userActual = UserPersistenceMapper.userToUserEntity(user);
 
-        assertNotNull(user);
-        assertEquals(expectedUserEntity.getId(), user.getId());
-        assertEquals(expectedUserEntity.getUsername(), user.getUsername());
-        assertEquals(expectedUserEntity.getEmail(), user.getEmail());
-        assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertNotNull(userActual);
+        assertEquals(expectedUserEntity.getId(), userActual.getId());
+        assertEquals(expectedUserEntity.getUsername(), userActual.getUsername());
+        assertEquals(expectedUserEntity.getEmail(), userActual.getEmail());
+        assertEquals(expectedUserEntity.getPassword(), userActual.getPassword());
+        assertEquals(expectedUserEntity.getRoles(), userActual.getRoles());
     }
 
     @Test
@@ -150,7 +176,7 @@ public class UserOutAdapterTest {
         assertEquals(expectedUserEntity.getUsername(), user.getUsername());
         assertEquals(expectedUserEntity.getEmail(), user.getEmail());
         assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertEquals(expectedUserEntity.getRoles(), user.getRoles());
     }
 
     @Test
@@ -164,7 +190,7 @@ public class UserOutAdapterTest {
         assertEquals(expectedUserEntity.getUsername(), user.getUsername());
         assertEquals(expectedUserEntity.getEmail(), user.getEmail());
         assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertEquals(expectedUserEntity.getRoles(), user.getRoles());
     }
 
     @Test
@@ -207,7 +233,7 @@ public class UserOutAdapterTest {
         assertEquals(expectedUserEntity.getUsername(), user.getUsername());
         assertEquals(expectedUserEntity.getEmail(), user.getEmail());
         assertEquals(expectedUserEntity.getPassword(), user.getPassword());
-        assertEquals(expectedUserEntity.getRole(), user.getRole());
+        assertEquals(expectedUserEntity.getRoles(), user.getRoles());
 
         verify(userRepository, times(1)).save(UserPersistenceMapper.userToUserEntity(userFromRequest));
     }

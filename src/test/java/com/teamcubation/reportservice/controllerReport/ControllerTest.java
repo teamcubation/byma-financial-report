@@ -116,7 +116,7 @@ public class ControllerTest {
         assertEquals(mockListReports(), result.getBody());
     }
     @Test
-    void whenGetAllReportsByEmail_thenReturnAllReports() {
+    void whenGetAllReportsByEmail_thenReturnAllReports() throws InvalidObject {
         when(reportInPort.findByUserEmail()).thenReturn(mockListReports());
         ResponseEntity<List<Report>> result = reportController.getReportsByEmail();
         assertEquals(mockListReports(), result.getBody());
