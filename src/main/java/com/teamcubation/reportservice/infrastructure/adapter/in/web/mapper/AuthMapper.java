@@ -19,7 +19,6 @@ public class AuthMapper {
                 .password(registerRequest.getPassword())
                 .roles(Set.of(Role.builder().role(UserRole.USER).build())) //Role USER by default
                 .build();
-        log.info("User: {}", user);
         return user;
     }
 
@@ -28,7 +27,6 @@ public class AuthMapper {
                 .email(loginRequest.getEmail())
                 .password(loginRequest.getPassword())
                 .build();
-        log.info("User: {}", user);
         return user;
     }
 }

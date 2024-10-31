@@ -46,11 +46,9 @@ public class ReportController implements ApiReport {
     }
 
     private HttpHeaders generateHeader(String contentType, String fileName) {
-        log.info(AnsiColor.BLUE + "Generating headers for file download" + AnsiColor.RESET);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
         headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-        log.info(AnsiColor.BLUE + "Finished: headers generated successfully" + AnsiColor.RESET);
         return headers;
     }
 

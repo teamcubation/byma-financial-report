@@ -25,7 +25,7 @@ public class UserService implements UserInPort {
 
     @Override
     public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
-        log.info("[UserService] Creating user: {}", user);
+        log.info("FCreating user: {}", user);
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException();
         }
@@ -42,21 +42,21 @@ public class UserService implements UserInPort {
     @Override
     public User findById(long id) throws UserNotFoundException, UserEntityNotFoundException {
         User user = userOutPort.findById(id);
-        log.info("[UserService] User found by id: {}", user);
+        log.info("User found by id: {}", user);
         return user;
     }
 
     @CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User update(User user) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
-        log.info("[UserService] Updating user: {}", user);
+        log.info("Updating user: {}", user);
         User existingUser = userOutPort.findById(user.getId());
-        log.info("[UserService] Existing user: {}", existingUser);
+        log.info("Existing user: {}", existingUser);
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
                 throw new UserDuplicateException("Email already exists");
             }
-            log.info("[UserService] Updating email from {} to {}", existingUser.getEmail(), user.getEmail());
+            log.info("Updating email from {} to {}", existingUser.getEmail(), user.getEmail());
             existingUser.setEmail(user.getEmail());
         }
 
@@ -64,17 +64,17 @@ public class UserService implements UserInPort {
             if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
                 throw new UserDuplicateException("Username already exists");
             }
-            log.info("[UserService] Updating username from {} to {}", existingUser.getUsername(), user.getUsername());
+            log.info("Updating username from {} to {}", existingUser.getUsername(), user.getUsername());
             existingUser.setUsername(user.getUsername());
         }
 
         if (user.getRoles() != null) {
-            log.info("[UserService] Updating role from {} to {}", existingUser.getRoles(), user.getRoles());
+            log.info("Updating role from {} to {}", existingUser.getRoles(), user.getRoles());
             existingUser.setRoles(user.getRoles());
         }
 
         if (user.getPassword() != null) {
-            log.info("[UserService] Updating password from {} to {}", existingUser.getPassword(), user.getPassword());
+            log.info("Updating password from {} to {}", existingUser.getPassword(), user.getPassword());
             existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
 
@@ -92,7 +92,7 @@ public class UserService implements UserInPort {
 
     @Override
     public List<User> getAll() throws UserNotFoundException {
-        log.info("[UserService] Getting all users");
+        log.info("Getting all users");
         return userOutPort.getAll();
     }
 

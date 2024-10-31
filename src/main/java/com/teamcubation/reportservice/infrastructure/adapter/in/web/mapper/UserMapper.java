@@ -20,7 +20,6 @@ public class UserMapper {
 
     public static User userRequestToUser(Long id, UserRequest userRequest) throws InvalidUserModel {
         validateParams(userRequest);
-        log.info("UserRequest: {}", userRequest);
         User user = User.builder()
                 .id(id)
                 .username(userRequest.getUsername())
@@ -38,7 +37,6 @@ public class UserMapper {
 
     public static UserResponse userToUserResponse(User user) throws InvalidUserModel {
         validateParams(user);
-        log.info("User: {}", user);
         return UserResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -49,7 +47,6 @@ public class UserMapper {
 
     public static User userUpdateRequestDTOToUser(long id, UserUpdateRequestDTO userUpdateRequestDTO) throws InvalidUserModel {
         validateParams(userUpdateRequestDTO);
-        log.info("UserUpdateRequestDTO: {}", userUpdateRequestDTO);
         return User.builder()
                 .id(id)
                 .username(userUpdateRequestDTO.getUsername())
@@ -90,8 +87,6 @@ public class UserMapper {
 
     private static void validateParams(Object... params) throws InvalidUserModel {
         if (ControllerValidator.isNull(params)) {
-            log.error("Params cannot be null");
-
             throw new InvalidUserModel("User not found");
         }
     }

@@ -25,9 +25,9 @@ public class UserOutAdapter implements UserOutPort {
     @Override
     public User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException {
         validateNullParams(user);
-        log.info("[UserOutAdapter] Registering user: {}", user);
+        log.info("Registering user: {}", user);
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
-        log.info("[UserOutAdapter] User saved: {}", saved);
+        log.info("User saved: {}", saved);
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
@@ -59,16 +59,16 @@ public class UserOutAdapter implements UserOutPort {
         UserEntity userById = userRepository
                 .findById(id)
                 .orElseThrow(() -> new UserEntityNotFoundException("User not found"));
-        log.info("[UserOutAdapter] User found by id (is a UserEntity): {}", userById);
+        log.info("User found by id (is a UserEntity): {}", userById);
         return UserPersistenceMapper.userEntityToUser(userById);
     }
 
     @Override
     public List<User> getAll() throws UserNotFoundException {
-        log.info("[UserOutAdapter] Getting all users");
+        log.info("Getting all users");
         List<User> users = new ArrayList<>();
         List<UserEntity> userEntities = userRepository.findAll();
-        log.info("[UserOutAdapter] Users entities found: {}", userEntities);
+        log.info("Users entities found: {}", userEntities);
         for (UserEntity userEntity : userEntities) {
             users.add(UserPersistenceMapper.userEntityToUser(userEntity));
         }
@@ -78,11 +78,10 @@ public class UserOutAdapter implements UserOutPort {
     @Override
     public User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException {
         validateNullParams(user);
-        log.info("[UserOutAdapter] Updating user: {}", user);
+        log.info("Updating user: {}", user);
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
-        log.info("[UserOutAdapter] User mapped to UserEntity: {}", userEntity);
         UserEntity updated = userRepository.save(userEntity);
-        log.info("[UserOutAdapter] User updated: {}", updated);
+        log.info("User updated: {}", updated);
         return UserPersistenceMapper.userEntityToUser(updated);
     }
 

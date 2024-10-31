@@ -8,6 +8,7 @@ import com.teamcubation.reportservice.application.service.generatorfile.Generato
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorPdf;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
@@ -93,8 +94,8 @@ public class ReportService implements ReportInPort {
     public byte[] downloadFile(String id) throws IOException {
         ReportEntity reportEntity = reportOutPort.findById(id);
         if (reportEntity == null) {
-            log.warn(REPORT_NOT_FOUND);
-            throw new RuntimeException(REPORT_NOT_FOUND);
+            log.info(REPORT_NOT_FOUND);
+            throw new ReportNotFoundException(REPORT_NOT_FOUND);
         }
         return reportEntity.getContent();
     }
