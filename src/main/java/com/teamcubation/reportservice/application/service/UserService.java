@@ -62,8 +62,8 @@ public class UserService implements UserInPort {
             existingUser.setUsername(user.getUsername());
         }
 
-        if (user.getRole() != null) {
-            existingUser.setRole(user.getRole());
+        if (user.getRoles() != null) {
+            existingUser.setRoles(user.getRoles());
         }
 
         if (user.getPassword() != null) {

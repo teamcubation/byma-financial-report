@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.controllerReport;
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl.ReportController;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,13 +38,9 @@ public class ControllerTest {
     public static final String ID_1 = "1";
     public static final String REPORT_1 = "report1";
     public static final String USER_1 = "user1";
-    public static final String URLCSV_1 = "urlcsv1";
-    public static final String URLPDF_1 = "urlpdf1";
     public static final String ID_2 = "2";
     public static final String REPORT_2 = "report2";
     public static final String USER_2 = "user2";
-    public static final String URLCSV_2 = "urlcsv2";
-    public static final String URLPDF_2 = "urlpdf2";
 
     @InjectMocks
     private ReportController reportController;
@@ -62,16 +59,14 @@ public class ControllerTest {
         report1.setId(ID_1);
         report1.setTitle(REPORT_1);
         report1.setUserEmail(USER_1);
-        report1.setDownloadUrlCsv(URLCSV_1);
-        report1.setDownloadUrlPdf(URLPDF_1);
+        report1.setDownloadUrl(null);
         report1.setContent(MOCK_BYTE_ARRAY_RESULT);
         report1.setCreationDate(null);
         Report report2 = new Report();
         report2.setId(ID_2);
         report2.setTitle(REPORT_2);
         report2.setUserEmail(USER_2);
-        report2.setDownloadUrlCsv(URLCSV_2);
-        report2.setDownloadUrlPdf(URLPDF_2);
+        report2.setDownloadUrl(null);
         report2.setContent(MOCK_BYTE_ARRAY_RESULT);
         report2.setCreationDate(null);
         return List.of(report1, report2);
@@ -114,9 +109,28 @@ public class ControllerTest {
     }
 
     @Test
-    void whenGetAllReports_thenReturnAll2Reports() {
+    void whenGetAllReports_thenReturnAllReports() {
         when(reportInPort.getAllReports()).thenReturn(mockListReports());
         ResponseEntity<List<Report>> result = reportController.getAllReports();
         assertEquals(mockListReports(), result.getBody());
+    }
+    @Test
+    void whenGetAllReportsByEmail_thenReturnAllReports() {
+        when(reportInPort.findByUserEmail()).thenReturn(mockListReports());
+        ResponseEntity<List<Report>> result = reportController.getReportsByEmail();
+        assertEquals(mockListReports(), result.getBody());
+    }
+    @Test
+    void whenDownloadExistingReport_thenReturnReport() throws Exception {
+        when(reportInPort.downloadFile(ID_1)).thenReturn(MOCK_BYTE_ARRAY_RESULT);
+        ResponseEntity<byte[]> result = reportController.downloadExistingReport(ID_1, PDF);
+        assertEquals(result.getBody(), MOCK_BYTE_ARRAY_RESULT);
+        assertEquals(APPLICATION_PDF_PATH, result.getHeaders().getContentType().toString());
+        assertEquals(ATTACHMENT_FILENAME_REPORT_PDF, result.getHeaders().getFirst(CONTENT_DISPOSITION));
+    }
+    @Test
+    void whenDownloadUnExistingReport_thenReturnNotFoundException() throws Exception {
+        when(reportInPort.downloadFile(ID_1)).thenThrow(ReportNotFoundException.class);
+        assertThrows(ReportNotFoundException.class, () -> reportController.downloadExistingReport(ID_1, PDF));
     }
 }
