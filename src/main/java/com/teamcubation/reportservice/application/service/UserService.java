@@ -22,7 +22,7 @@ public class UserService implements UserInPort {
     private final UserOutPort userOutPort;
     private final PasswordEncoder passwordEncoder;
 
-    @CachePut(value = "usersCache", key = "#user.id")
+    //@CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {

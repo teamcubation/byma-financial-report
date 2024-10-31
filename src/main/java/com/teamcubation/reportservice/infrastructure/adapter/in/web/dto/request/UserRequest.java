@@ -1,6 +1,7 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class UserRequest {
     @NotBlank(message = PASSWORD_CANNOT_BE_EMPTY)
     private String password;
 
-    @NotBlank(message = ROLE_CANNOT_BE_EMPTY)
+    @NotEmpty(message = ROLE_CANNOT_BE_EMPTY)
     private Set<String> roles;
 
 }
