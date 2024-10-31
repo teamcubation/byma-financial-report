@@ -3,7 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiReport;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +22,7 @@ public class ReportController implements ApiReport {
 
     @Override
     @GetMapping("/generateReport")
-    public ResponseEntity<byte[]> downloadFile(@RequestParam(defaultValue = "pdf") String typeFile, @RequestParam(required = false) String typeInstrument) throws IOException, InvalidObject {
+    public ResponseEntity<byte[]> downloadFile(@RequestParam(defaultValue = "pdf") String typeFile, @RequestParam(required = false) String typeInstrument) throws IOException, InvalidObjectException {
         byte[] fileContent = reportService.generateFile(typeFile, typeInstrument);
 
         return ResponseEntity.ok()
@@ -39,12 +39,12 @@ public class ReportController implements ApiReport {
     }
 
     @GetMapping("/reportHistory")
-    public ResponseEntity<List<Report>> getAllReports() throws InvalidObject {
+    public ResponseEntity<List<Report>> getAllReports() throws InvalidObjectException {
         return ResponseEntity.ok(reportService.getAllReports());
     }
 
     @GetMapping("/reportHistoryByEmail")
-    public ResponseEntity<List<Report>> getReportsByEmail() throws InvalidObject {
+    public ResponseEntity<List<Report>> getReportsByEmail() throws InvalidObjectException {
         List<Report> reports = reportService.findByUserEmail();
         return ResponseEntity.ok(reports);
     }

@@ -12,7 +12,6 @@ import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,7 +109,7 @@ public class ServiceTest {
         return reportA;
     }
     @Test
-    void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException, InvalidObject {
+    void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws Exception {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
@@ -121,7 +120,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException, InvalidObject {
+    void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws Exception {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         when(reportOutPort.save(any(Report.class))).thenReturn(ReportPersistenceMapper.reportModelToReportEntity(new Report()));
@@ -138,7 +137,7 @@ public class ServiceTest {
     }
 
     @Test
-    void whenGeneratePdfWithStocksParams_thenReturnListOfStocksTest() throws IOException {
+    void whenGeneratePdfWithStocksParams_thenReturnListOfStocksTest() throws Exception {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
@@ -148,7 +147,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void whenGeneratePdfWithBondsParams_thenReturnListOfBondsTest() throws IOException {
+    void whenGeneratePdfWithBondsParams_thenReturnListOfBondsTest() throws Exception {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
             mockedGeneratorPdf.when(() -> GeneratorPdf.generatePdfContent(any(), any()))
@@ -158,7 +157,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void generatePdfWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
+    void generatePdfWithNullParams_thenReturnInvalidTypeExceptionTest() throws Exception {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorPdf> mockedGeneratorPdf = mockStatic(GeneratorPdf.class)) {
@@ -183,7 +182,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void whenGenerateCsvWithBondsParams_thenReturnListOfBondsTest() throws IOException {
+    void whenGenerateCsvWithBondsParams_thenReturnListOfBondsTest() throws Exception {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
             mockedGeneratorCsv.when(() -> GeneratorCsv.generateCsv(any(), any()))
@@ -193,7 +192,7 @@ public class ServiceTest {
         }
     }
     @Test
-    void whenGenerateCsvWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
+    void whenGenerateCsvWithNullParams_thenReturnInvalidTypeExceptionTest() throws Exception {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
         try (MockedStatic<GeneratorCsv> mockedGeneratorCsv = mockStatic(GeneratorCsv.class)) {
@@ -209,7 +208,7 @@ public class ServiceTest {
     }
 
     @Test
-    void whenGetAllReports_returnNoDataReportTest() throws InvalidObject {
+    void whenGetAllReports_returnNoDataReportTest() throws Exception {
         List<ReportEntity> reportList = new ArrayList<>();
         when(reportOutPort.getAll()).thenReturn(reportList);
         List<Report> result = reportService.getAllReports();
@@ -218,7 +217,7 @@ public class ServiceTest {
 
 
     @Test
-    void whenGetAllReports_return2ReportsTest() throws InvalidObject {
+    void whenGetAllReports_return2ReportsTest() throws Exception {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
@@ -236,7 +235,7 @@ public class ServiceTest {
 
 
     @Test
-    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest() throws InvalidObject {
+    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest() throws Exception {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
 
@@ -251,7 +250,7 @@ public class ServiceTest {
         assertEquals(result.size(), reportList.size());
     }
     @Test
-    void whenDownloadFileWithValidId_thenReturnFileTest() throws InvalidObject {
+    void whenDownloadFileWithValidId_thenReturnFileTest() throws Exception {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
         String id = reportA.getId();

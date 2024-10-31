@@ -6,7 +6,7 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.exceptionHandler.GlobalExceptionHandler;
-import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,7 +139,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnStatusCode409_whenUserToCreateHasADuplicatedName() throws Exception {
-        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER));
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER));
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
@@ -147,12 +147,12 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_USERNAME_USER));
+                .andExpect(jsonPath("$.message").value(MessageConstants.DUPLICATED_USERNAME_USER));
     }
 
     @Test
     void shouldReturnStatusCode409_whenUserToCreateHasADuplicatedEmail() throws Exception {
-        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER));
+        when(userInPort.create(UserMapper.userRequestToUser(null, userRequest))).thenThrow(new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER));
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
@@ -160,7 +160,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_EMAIL_USER));
+                .andExpect(jsonPath("$.message").value(MessageConstants.DUPLICATED_EMAIL_USER));
     }
 
     @Test
@@ -241,12 +241,12 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldReturnStatusCode409_whenGetUserByIdIsNotFound() throws Exception {
-        when(userInPort.findById(ID_1)).thenThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND));
+    void shouldReturnStatusCode404_whenGetUserByIdIsNotFound() throws Exception {
+        when(userInPort.findById(ID_1)).thenThrow(new UserNotFoundException(MessageConstants.USER_NOT_FOUND));
 
         mockMvc.perform(get(BASE_URL + "{id}", ID_1))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(MessageConstants.USER_NOT_FOUND));
     }
 
     @Test
@@ -258,12 +258,12 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldReturnStatusCode409_whenDeleteUserByIdIsNotFound() throws Exception {
-        doThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND)).when(userInPort).delete(ID_1);
+    void shouldReturnStatusCode404_whenDeleteUserByIdIsNotFound() throws Exception {
+        doThrow(new UserNotFoundException(MessageConstants.USER_NOT_FOUND)).when(userInPort).delete(ID_1);
 
         mockMvc.perform(delete(BASE_URL + "{id}", ID_1))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(MessageConstants.USER_NOT_FOUND));
     }
 
     @Test
@@ -299,7 +299,7 @@ class UserControllerTest {
                 .build();
 
         when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameName)))
-                .thenThrow(new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER));
+                .thenThrow(new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER));
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequestToUpdateWithSameName);
 
@@ -307,7 +307,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_USERNAME_USER));
+                .andExpect(jsonPath("$.message").value(MessageConstants.DUPLICATED_USERNAME_USER));
     }
 
     @Test
@@ -319,7 +319,7 @@ class UserControllerTest {
                 .password(PASSWORD_2)
                 .build();
 
-        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER));
+        when(userInPort.update(UserMapper.userRequestToUser(ID_1, userRequestToUpdateWithSameEmail))).thenThrow(new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER));
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequestToUpdateWithSameEmail);
 
@@ -327,19 +327,19 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.DUPLICATED_EMAIL_USER));
+                .andExpect(jsonPath("$.message").value(MessageConstants.DUPLICATED_EMAIL_USER));
     }
 
     @Test
-    void shouldReturnStatusCode409_whenUpdateUserIsNotFound() throws Exception {
-        when(userInPort.update(UserMapper.userRequestToUser(ID_NONEXISTENT, userRequest))).thenThrow(new UserNotFoundException(MessageException.USER_NOT_FOUND));
+    void shouldReturnStatusCode404_whenUpdateUserIsNotFound() throws Exception {
+        when(userInPort.update(UserMapper.userRequestToUser(ID_NONEXISTENT, userRequest))).thenThrow(new UserNotFoundException(MessageConstants.USER_NOT_FOUND));
 
         String jsonContent = new ObjectMapper().writeValueAsString(userRequest);
 
         mockMvc.perform(put(BASE_URL + "{id}", ID_NONEXISTENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(MessageException.USER_NOT_FOUND));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(MessageConstants.USER_NOT_FOUND));
     }
 }

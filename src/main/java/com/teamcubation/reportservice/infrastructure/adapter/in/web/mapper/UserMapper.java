@@ -4,7 +4,7 @@ import com.teamcubation.reportservice.application.service.exception.InvalidUserM
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
-import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
@@ -94,7 +94,7 @@ public class UserMapper {
         if (ControllerValidator.isNull(params)) {
             log.error("Params cannot be null");
 
-            throw new InvalidUserModel(MessageException.INVALID_USER_MODEL);
+            throw new InvalidUserModel(MessageConstants.INVALID_USER_MODEL);
         }
     }
 

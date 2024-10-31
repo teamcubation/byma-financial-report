@@ -1,6 +1,6 @@
 package com.teamcubation.reportservice.exceptionHandler.utils;
 
-public class MessageException {
+public class MessageConstants {
     public static final String DUPLICATED_USERNAME_USER = "Username already exists";
     public static final String DUPLICATED_EMAIL_USER = "Email already exists";
     public static final String USER_NOT_FOUND = "User not found";

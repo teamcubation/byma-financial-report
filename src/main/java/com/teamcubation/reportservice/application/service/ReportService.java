@@ -14,7 +14,7 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto
 import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class ReportService implements ReportInPort {
     private static final String INSTRUMENT_TYPE_NOT_SUPPORTED = "Instrument type not supported";
     private static final String REPORT_NOT_FOUND = "Report not found";
 
-    public byte[] generateFile(String typeFile, String typeInstrument) throws IOException, InvalidObject {
+    public byte[] generateFile(String typeFile, String typeInstrument) throws IOException, InvalidObjectException {
         log.info("Generating file: typeFile={}, typeInstrument={}", typeFile, typeInstrument);
         byte[] fileContent = switch (typeFile) {
             case CSV_TYPE -> generateCsv(typeInstrument);
@@ -72,7 +72,7 @@ public class ReportService implements ReportInPort {
         throw new RuntimeException(USER_NOT_AUTHENTICATED);
     }
 
-    private Report createReport(byte[] reportContent, String userEmail, String typeFile, String typeInstrument) throws InvalidObject {
+    private Report createReport(byte[] reportContent, String userEmail, String typeFile, String typeInstrument) throws InvalidObjectException {
         log.info("Creating report for userEmail={}, typeFile={}, typeInstrument={}", userEmail, typeFile, typeInstrument);
         List<String> downloadUrls = new ArrayList<>();
         Report report = Report.builder()
@@ -130,13 +130,13 @@ public class ReportService implements ReportInPort {
         };
     }
 
-    public List<Report> findByUserEmail() throws InvalidObject {
+    public List<Report> findByUserEmail() throws InvalidObjectException {
         String userEmail = getAuthenticatedUserEmail();
         return getReportsByUserEmail(userEmail);
     }
 
     @Cacheable(value = "reportsCache", key = "#userEmail")
-    public List<Report> getReportsByUserEmail(String userEmail) throws InvalidObject {
+    public List<Report> getReportsByUserEmail(String userEmail) throws InvalidObjectException {
         log.info("Fetching reports from cache for user: {}", userEmail);
 
         List<ReportEntity> reportsEntity = reportOutPort.findByUserEmail(userEmail);
@@ -151,7 +151,7 @@ public class ReportService implements ReportInPort {
     }
 
     @Cacheable(value = "allReportsCache")
-    public List<Report> getAllReports() throws InvalidObject  {
+    public List<Report> getAllReports() throws InvalidObjectException  {
         List<ReportEntity> entityReports = reportOutPort.getAll();
         List<Report> reports = new ArrayList<>();
 
@@ -163,7 +163,7 @@ public class ReportService implements ReportInPort {
     }
 
     @CacheEvict(value = "reportsCache", key = "#userEmail")
-    public Report save(Report report) throws InvalidObject {
+    public Report save(Report report) throws InvalidObjectException {
         String userEmail = getAuthenticatedUserEmail();
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }

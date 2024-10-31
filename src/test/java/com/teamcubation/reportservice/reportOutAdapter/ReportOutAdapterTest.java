@@ -4,7 +4,7 @@ import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFo
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.report.ReportOutAdapter;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObject;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.ReportRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +65,9 @@ public class ReportOutAdapterTest {
     }
 
     @Test
-    void whenSave_thenReturnReportTest() throws InvalidObject {
+    void whenSave_thenReturnReportTest() throws InvalidObjectException
+
+    {
         Report report = new Report();
         ReportEntity reportEntity = new ReportEntity();
         when(reportRepository.save(any())).thenReturn(reportEntity);
@@ -78,7 +78,7 @@ public class ReportOutAdapterTest {
 
 
     @Test
-    void whenFindById_thenReturnReportTest() throws InvalidObject {
+    void whenFindById_thenReturnReportTest() throws InvalidObjectException {
         ReportEntity report = ReportPersistenceMapper.reportModelToReportEntity(mockReport());
         when(reportRepository.findById(ID_1)).thenReturn(Optional.of(report));
         ReportEntity result = reportOutAdapter.findById(ID_1);
@@ -87,7 +87,7 @@ public class ReportOutAdapterTest {
     }
 
     @Test
-    void whenGetAll_thenReturnReportListTest() throws InvalidObject {
+    void whenGetAll_thenReturnReportListTest() throws InvalidObjectException {
         List<ReportEntity> reportList = List.of(ReportPersistenceMapper.reportModelToReportEntity(mockReport()), ReportPersistenceMapper.reportModelToReportEntity(mockReport2()));
         when(reportRepository.findAll()).thenReturn(reportList);
         List<ReportEntity> result = reportOutAdapter.getAll();
@@ -96,7 +96,7 @@ public class ReportOutAdapterTest {
     }
 
     @Test
-    void whenFindByUserEmail_thenReturnReportListTest() throws InvalidObject {
+    void whenFindByUserEmail_thenReturnReportListTest() throws InvalidObjectException {
         List<ReportEntity> reportList = List.of(ReportPersistenceMapper.reportModelToReportEntity(mockReport()), ReportPersistenceMapper.reportModelToReportEntity(mockReport2()));
         when(reportRepository.findByUserEmail(TEST_GMAIL)).thenReturn(reportList);
         List<ReportEntity> result = reportOutAdapter.findByUserEmail(TEST_GMAIL);

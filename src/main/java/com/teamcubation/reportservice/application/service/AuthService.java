@@ -8,7 +8,7 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
-import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,11 +43,11 @@ public class AuthService implements AuthInPort {
     public String register(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
 
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER);
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }
 
         if (authOutPort.existsByUserNameIgnoreCase(user.getUsername())) {
-            throw new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER);
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
         }
         //Hardcodeamos el rol de admin
         if (user.getEmail().equalsIgnoreCase(ADMIN_EMAIL)) {

@@ -5,7 +5,7 @@ import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
-import com.teamcubation.reportservice.exceptionHandler.utils.MessageException;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,11 +27,11 @@ public class UserService implements UserInPort {
     @Override
     public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER);
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }
 
         if (userOutPort.existsByNameIgnoreCase(user.getUsername())) {
-            throw new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER);
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -51,14 +51,14 @@ public class UserService implements UserInPort {
         User existingUser = userOutPort.findById(user.getId());
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-                throw new UserDuplicateException(MessageException.DUPLICATED_EMAIL_USER);
+                throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
             }
             existingUser.setEmail(user.getEmail());
         }
 
         if (user.getUsername() != null) {
             if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
-                throw new UserDuplicateException(MessageException.DUPLICATED_USERNAME_USER);
+                throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
             }
             existingUser.setUsername(user.getUsername());
         }
@@ -80,7 +80,7 @@ public class UserService implements UserInPort {
     @Override
     public void delete(long id) throws UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.findById(id) == null) {
-            throw new UserEntityNotFoundException(MessageException.USER_ENTITY_NOT_FOUND);
+            throw new UserEntityNotFoundException(MessageConstants.USER_ENTITY_NOT_FOUND);
         }
       
         userOutPort.deleteUserById(id);
