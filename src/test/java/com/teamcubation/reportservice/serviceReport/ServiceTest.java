@@ -25,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -62,8 +63,9 @@ public class ServiceTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
     }
-    List<StockDto>mockStocks(){
-        List <StockDto> stocks = new ArrayList<>();
+
+    List<StockDto> mockStocks() {
+        List<StockDto> stocks = new ArrayList<>();
         StockDto stock = new StockDto();
         stock.setCreationDate(LocalDate.now());
         stock.setId(Long.parseLong(ID_1));
@@ -73,8 +75,9 @@ public class ServiceTest {
         stocks.add(stock);
         return stocks;
     }
-    List<BonoDto>mockBonds(){
-        List <BonoDto> bonds = new ArrayList<>();
+
+    List<BonoDto> mockBonds() {
+        List<BonoDto> bonds = new ArrayList<>();
         BonoDto bono = new BonoDto();
         bono.setCreationDate(LocalDate.now());
         bono.setId(Long.parseLong(ID_1));
@@ -84,6 +87,7 @@ public class ServiceTest {
         bonds.add(bono);
         return bonds;
     }
+
     private static Report mockReportB() {
         Report reportB = new Report();
         reportB.setId(ID_2);
@@ -95,6 +99,7 @@ public class ServiceTest {
         reportB.setContent(new byte[]{});
         return reportB;
     }
+
     private static Report mockReportA() {
         Report reportA = new Report();
         reportA.setId(ID_1);
@@ -106,6 +111,7 @@ public class ServiceTest {
         reportA.setContent(new byte[]{});
         return reportA;
     }
+
     @Test
     void whenGenerateFileWithPdfParams_thenReturnPdfFileTest() throws IOException {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
@@ -117,6 +123,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGenerateFileWithCsvParams_thenReturnCsvFileTest() throws IOException {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
@@ -129,6 +136,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGenerateFileWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
         assertThrows(InvalidTypeFyleException.class, () -> reportService.generateFile(INVALID, STOCKS));
@@ -144,6 +152,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGeneratePdfWithBondsParams_thenReturnListOfBondsTest() throws IOException {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
@@ -154,6 +163,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void generatePdfWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
@@ -165,10 +175,12 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGeneratePdfWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
         assertThrows(InvalidInstrumentException.class, () -> reportService.generatePdf(INVALID));
     }
+
     @Test
     void whenGenerateCsvWithStocksParams_thenReturnListOfStocksTest() throws IOException {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
@@ -179,6 +191,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGenerateCsvWithBondsParams_thenReturnListOfBondsTest() throws IOException {
         when(connectionOutPort.getAllStocks()).thenReturn(mockStocks());
@@ -189,6 +202,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGenerateCsvWithNullParams_thenReturnInvalidTypeExceptionTest() throws IOException {
         when(connectionOutPort.getAllBonds()).thenReturn(mockBonds());
@@ -200,6 +214,7 @@ public class ServiceTest {
             assertEquals(MOCK_BYTE_ARRAY_RESULT, result);
         }
     }
+
     @Test
     void whenGenerateCsvWithInvalidParams_thenReturnInvalidTypeExceptionTest() {
         assertThrows(InvalidInstrumentException.class, () -> reportService.generateCsv(INVALID));
@@ -231,9 +246,8 @@ public class ServiceTest {
     }
 
 
-
     @Test
-    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest(){
+    void whenFindByEmailWithValidEmail_thenReturnListOfReportsTest() {
         Report reportA = mockReportA();
         reportOutPort.save(reportA);
 

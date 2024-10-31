@@ -1,7 +1,7 @@
 package com.teamcubation.reportservice.application.service;
+
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.application.port.out.ConnectionOutPort;
-
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.application.port.out.UserOutPort;
 import com.teamcubation.reportservice.application.service.generatorfile.GeneratorCsv;
@@ -9,18 +9,15 @@ import com.teamcubation.reportservice.application.service.generatorfile.Generato
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
 import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
 import com.teamcubation.reportservice.domain.model.report.Report;
-import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.BonoDto;
-import com.teamcubation.reportservice.infrastructure.adapter.out.externalapi.dto.StockDto;
-import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -60,9 +57,10 @@ public class ReportService implements ReportInPort {
         return fileContent;
     }
 
-    private String getAuthenticatedUserEmail(){
+    private String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()){
+        log.info("Fetching authenticated user email from security context authentication: {}   ", authentication);
+        if (authentication != null && authentication.isAuthenticated()) {
             log.info("Authenticated user email: {}", authentication.getName());
             return authentication.getName();
         }
@@ -105,7 +103,7 @@ public class ReportService implements ReportInPort {
         log.info("Fetching all bonds and stocks for PDF generation.");
         if (typeInstrument == null) {
             return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
+        }
         if (typeInstrument.equals(BONDS_TYPE)) {
             return GeneratorPdf.generatePdfContent(connectionOutPort.getAllBonds(), null);
         }
@@ -116,13 +114,12 @@ public class ReportService implements ReportInPort {
         throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
     }
 
-   
 
     public byte[] generateCsv(String typeInstrument) throws IOException {
         log.info("Fetching all stocks and stocks for PDF generation.");
         if (typeInstrument == null) {
             return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), connectionOutPort.getAllStocks());
-        } 
+        }
         if (typeInstrument.equals(BONDS_TYPE)) {
             return GeneratorCsv.generateCsv(connectionOutPort.getAllBonds(), null);
         }
@@ -135,6 +132,7 @@ public class ReportService implements ReportInPort {
 
     public List<Report> findByUserEmail() {
         String userEmail = getAuthenticatedUserEmail();
+        log.info("Fetching reports for user: {}", userEmail);
         return getReportsByUserEmail(userEmail);
     }
 
@@ -150,6 +148,7 @@ public class ReportService implements ReportInPort {
 
     @Cacheable(value = "allReportsCache")
     public List<Report> getAllReports() {
+        log.info("Fetching all reports");
         return reportOutPort.getAll().stream()
                 .map(ReportPersistenceMapper::reportEntityToReportModel)
                 .collect(Collectors.toList());
@@ -157,6 +156,7 @@ public class ReportService implements ReportInPort {
 
     @CacheEvict(value = "reportsCache", key = "#userEmail")
     public Report save(Report report) {
+        log.info("Saving report: {}", report);
         String userEmail = getAuthenticatedUserEmail();
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));
     }

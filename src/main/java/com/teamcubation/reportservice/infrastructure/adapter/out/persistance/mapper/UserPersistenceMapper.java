@@ -26,7 +26,7 @@ public class UserPersistenceMapper {
                 .password(userEntity.getPassword())
                 .role(UserRole.valueOf(userEntity.getRole().toString()))
                 .build();
-        log.info("[UserPersistenceMapper] UserEntity mapped to User: {}", user);
+        log.info("UserEntity mapped to User: {}", user);
         return user;
     }
 
@@ -34,7 +34,7 @@ public class UserPersistenceMapper {
         if (PersistanceValidation.isNull(user)) {
             throw new UserEntityNotFoundException("User entity cannot be null");
         }
-        log.info("[UserPersistenceMapper] Mapping user to UserEntity: {}", user);
+        log.info("Mapping user to UserEntity: {}", user);
         UserEntity userEntity = UserEntity.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -42,7 +42,7 @@ public class UserPersistenceMapper {
                 .password(user.getPassword())
                 .role(user.getRole())
                 .build();
-        log.info("[UserPersistenceMapper] User mapped to UserEntity: {}", userEntity);
+        log.info("User mapped to UserEntity: {}", userEntity);
         return userEntity;
     }
 
