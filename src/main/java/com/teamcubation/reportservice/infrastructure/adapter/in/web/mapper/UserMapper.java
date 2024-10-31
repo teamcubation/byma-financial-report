@@ -25,8 +25,8 @@ public class UserMapper {
                 .password(userRequest.getPassword())
                 .build();
 
-        if (userRequest.getRole() != null) {
-            user.setRole(mapRole(userRequest.getRole()));
+        if (userRequest.getRoles() != null) {
+            user.setRoles(mapRole(userRequest.getRoles()));
         }
         log.info("[UserMapper] UserRequest mapped to User: {}", user);
 
@@ -40,7 +40,7 @@ public class UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .role(user.getRole().name())
+                .roles(user.getRoles().name())
                 .build();
         log.info("[UserMapper] User mapped to UserResponse: {}", userResponse);
         return userResponse;
@@ -53,7 +53,7 @@ public class UserMapper {
                 .username(userUpdateRequestDTO.getUsername())
                 .email(userUpdateRequestDTO.getEmail())
                 .password(userUpdateRequestDTO.getPassword())
-                .role(UserRole.USER)
+                .roles(UserRole.USER)
                 .build();
         log.info("[UserMapper] UserUpdateRequestDTO mapped to User: {}", user);
         return user;

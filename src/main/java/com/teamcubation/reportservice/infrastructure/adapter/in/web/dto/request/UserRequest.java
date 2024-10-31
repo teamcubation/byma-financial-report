@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,7 +33,7 @@ public class UserRequest implements JsonConvertible {
     private String password;
 
     @NotBlank(message = ROLE_CANNOT_BE_EMPTY)
-    private String role;
+    private Set<String> roles;
 
     @Override
     public String toJson() {
