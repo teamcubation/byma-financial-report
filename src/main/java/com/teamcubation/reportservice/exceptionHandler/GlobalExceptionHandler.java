@@ -22,7 +22,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //report
     @ExceptionHandler(ReportNotFoundException.class)
     public ResponseEntity<?> handleReportNotFoundException(ReportNotFoundException e, HttpServletRequest request) {
         return ResponseEntity
@@ -44,7 +43,6 @@ public class GlobalExceptionHandler {
                 .body(this.createErrorMessage(e, request, HttpStatus.BAD_REQUEST));
     }
 
-    //user y auth
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
         return ResponseEntity
@@ -74,7 +72,6 @@ public class GlobalExceptionHandler {
     }
 
 
-    //@Valid exception del controller
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(getValidationErrorsMap(ex));
