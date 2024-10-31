@@ -69,7 +69,7 @@ public class UserService implements UserInPort {
         }
 
         if (user.getRoles() != null) {
-            log.info("[UserService] Updating role from {} to {}", existingUser.getRole(), user.getRole());
+            log.info("[UserService] Updating role from {} to {}", existingUser.getRoles(), user.getRoles());
             existingUser.setRoles(user.getRoles());
         }
 

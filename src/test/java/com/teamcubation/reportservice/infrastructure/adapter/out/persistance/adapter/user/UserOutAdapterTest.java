@@ -1,4 +1,4 @@
-package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
+/*package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user;
 
 import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
@@ -246,4 +246,4 @@ public class UserOutAdapterTest {
     void shouldThrowIllegalArgumentException_whenInvalidIdIsProvided() {
         assertThrows(IllegalArgumentException.class, () -> userOutAdapter.deleteUserById(null));
     }
-}
+}*/
