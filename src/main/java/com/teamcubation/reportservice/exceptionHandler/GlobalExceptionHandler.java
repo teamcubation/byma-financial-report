@@ -1,6 +1,12 @@
 package com.teamcubation.reportservice.exceptionHandler;
 
-import com.teamcubation.reportservice.domain.MockCustomException;
+import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
+import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
+import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidInstrumentException;
+import com.teamcubation.reportservice.domain.customexceptions.report.InvalidTypeFyleException;
+import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +22,62 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ResponseEntity<?> handleReportNotFoundException(ReportNotFoundException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(this.createErrorMessage(e, request, HttpStatus.NOT_FOUND));
+    }
+
+    @ExceptionHandler(InvalidInstrumentException.class)
+    public ResponseEntity<?> handleInvalidInstrumentException(InvalidInstrumentException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(this.createErrorMessage(e, request, HttpStatus.BAD_REQUEST));
+    }
+
+    @ExceptionHandler(InvalidTypeFyleException.class)
+    public ResponseEntity<?> handleInvalidTypeFyleException(InvalidTypeFyleException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(this.createErrorMessage(e, request, HttpStatus.BAD_REQUEST));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(this.createErrorMessage(e, request, HttpStatus.NOT_FOUND));
+    }
+
+    @ExceptionHandler(UserEntityNotFoundException.class)
+    public ResponseEntity<?> handleUserEntityNotFoundException(UserEntityNotFoundException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(this.createErrorMessage(e, request, HttpStatus.NOT_FOUND));
+    }
+
+    @ExceptionHandler(UserDuplicateException.class)
+    public ResponseEntity<?> handleUserDuplicateException(UserDuplicateException e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(this.createErrorMessage(e, request, HttpStatus.CONFLICT));
+    }
+
+    @ExceptionHandler(InvalidUserModel.class)
+    public ResponseEntity<?> handleInvalidUserModel(InvalidUserModel e, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(this.createErrorMessage(e, request, HttpStatus.BAD_REQUEST));
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(getValidationErrorsMap(ex));
     }
 
-    @ExceptionHandler(MockCustomException.class)
-    public ResponseEntity<?> handleDuplicatedStockException(MockCustomException e, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(this.createErrorMessage(e, request, HttpStatus.CONFLICT));
-    }
 
 
     @ExceptionHandler(Exception.class)
