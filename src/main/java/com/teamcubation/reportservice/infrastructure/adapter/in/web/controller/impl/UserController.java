@@ -5,6 +5,8 @@ import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
+import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiUser;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
@@ -96,10 +98,7 @@ public class UserController implements ApiUser {
     private void validateParams(Object... params) throws InvalidUserModel {
         if (ControllerValidator.isNull(params)) {
             log.error(AnsiColor.BLUE + "Params cannot be null" + AnsiColor.RESET);
-            throw new InvalidUserModel("User not found");
+            throw new InvalidUserModel(MessageConstants.INVALID_USER_MODEL);
         }
-
     }
-
-
 }

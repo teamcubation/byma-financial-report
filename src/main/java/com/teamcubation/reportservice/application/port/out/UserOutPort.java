@@ -1,5 +1,4 @@
 package com.teamcubation.reportservice.application.port.out;
-
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
@@ -7,7 +6,6 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ada
 import java.util.List;
 
 public interface UserOutPort {
-
 
     User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException;
 

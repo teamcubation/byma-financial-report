@@ -4,6 +4,7 @@ import com.teamcubation.reportservice.application.service.exception.InvalidUserM
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserRequest;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.request.UserUpdateRequestDTO;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.dto.response.UserResponse;
@@ -34,9 +35,9 @@ public class UserMapper {
         return user;
     }
 
-
     public static UserResponse userToUserResponse(User user) throws InvalidUserModel {
         validateParams(user);
+
         return UserResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -78,16 +79,19 @@ public class UserMapper {
 
     public static List<UserResponse> usersToUserResponses(List<User> users) throws InvalidUserModel {
         validateParams(users);
+  
         List<UserResponse> userResponses = new ArrayList<>();
-        for (User user : users) {
+  
+        for(User user : users) {
             userResponses.add(userToUserResponse(user));
         }
+  
         return userResponses;
     }
 
     private static void validateParams(Object... params) throws InvalidUserModel {
         if (ControllerValidator.isNull(params)) {
-            throw new InvalidUserModel("User not found");
+            throw new InvalidUserModel(MessageConstants.INVALID_USER_MODEL);
         }
     }
 

@@ -3,7 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ma
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
-import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.validation.PersistanceValidation;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
@@ -34,8 +34,9 @@ public class UserPersistenceMapper {
 
     public static UserEntity userToUserEntity(User user) throws UserEntityNotFoundException {
         if (PersistanceValidation.isNull(user)) {
-            throw new UserEntityNotFoundException("User entity cannot be null");
+            throw new UserEntityNotFoundException(MessageConstants.USER_ENTITY_NOT_FOUND);
         }
+
         UserEntity userEntity = UserEntity.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -48,12 +49,15 @@ public class UserPersistenceMapper {
 
     public static List<User> userEntitiesToUsers(List<UserEntity> userEntities) throws UserEntityNotFoundException, UserNotFoundException {
         List<User> users = new ArrayList<>();
+      
         if (userEntities == null) {
-            throw new UserEntityNotFoundException("User entities cannot be null");
+            throw new UserEntityNotFoundException(MessageConstants.USER_ENTITY_NOT_FOUND);
         }
-        for (UserEntity userEntity : userEntities) {
+      
+        for(UserEntity userEntity : userEntities) {
             users.add(userEntityToUser(userEntity));
         }
+      
         return users;
     }
 

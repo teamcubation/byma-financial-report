@@ -6,6 +6,7 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
+
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import io.jsonwebtoken.security.Password;
 import org.junit.jupiter.api.BeforeEach;
@@ -152,8 +153,8 @@ class UserServiceTest {
     @Test
     void shouldReturnUserUpdateEmail_whenUpdateEmail() throws Exception {
         User userToUpdate = User.builder()
-                        .email("newEmail@gmail.com")
-                        .build();
+                .email("newEmail@gmail.com")
+                .build();
 
         when(userOutPort.findById(ID_1)).thenReturn(user);
         when(userOutPort.existsByEmailIgnoreCase(userToUpdate.getEmail())).thenReturn(false);

@@ -12,7 +12,6 @@ public interface AuthOutPort {
 
     User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException;
 
-
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByUserNameIgnoreCase(String username);

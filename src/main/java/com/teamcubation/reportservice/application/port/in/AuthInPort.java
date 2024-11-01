@@ -10,5 +10,4 @@ public interface AuthInPort {
     String login(User user) throws UserNotFoundException, UserEntityNotFoundException;
 
     String register(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException;
-
 }

@@ -9,6 +9,7 @@ import com.teamcubation.reportservice.application.service.exception.UserNotFound
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
 import com.teamcubation.reportservice.domain.model.user.UserRole;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,11 +52,11 @@ public class AuthService implements AuthInPort {
     public String register(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
         log.info("Register user: {}", user);
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new UserDuplicateException("Email already exists");
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }
 
         if (authOutPort.existsByUserNameIgnoreCase(user.getUsername())) {
-            throw new UserDuplicateException("Username already exists");
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
         }
         //Hardcodeamos el rol de admin
         if (user.getEmail().equalsIgnoreCase(ADMIN_EMAIL)) {

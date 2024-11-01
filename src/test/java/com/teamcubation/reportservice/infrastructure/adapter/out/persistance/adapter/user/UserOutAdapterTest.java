@@ -23,8 +23,8 @@ public class UserOutAdapterTest {
     private static final String USERNAME = "testUser";
     private static final String EMAIL = "test@example.com";
     private static final String PASSWORD = "password";
-    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
-    private static final String PARAMS_CANNOT_BE_NULL_MESSAGE = "Params cannot be null";
+    private static final String USER_NOT_FOUND_MESSAGE = "User Entity not found";
+    private static final String PARAMS_CANNOT_BE_NULL_MESSAGE = "Parameters cannot be null";
     private static final String NON_EXISTENT_EMAIL = "nonexistent@example.com";
     private static final String NON_EXISTENT_USERNAME = "nonexistentUser";
 

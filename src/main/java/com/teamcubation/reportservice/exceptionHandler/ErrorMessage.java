@@ -18,6 +18,4 @@ public class ErrorMessage {
     @Builder.Default
     private final LocalDateTime timestamp = LocalDateTime.now();
 
-
-
 }

@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ad
 import com.teamcubation.reportservice.application.port.out.ReportOutPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +21,21 @@ public class ReportOutAdapter implements ReportOutPort {
 
     @Override
     public List<ReportEntity> findByUserEmail(String email) {
-        log.info("Entro a la bdd - findByUserEmail");
         return reportRepository.findByUserEmail(email);
     }
 
     @Override
     public List<ReportEntity> getAll() {
-        log.info("Entro a la bdd - getAll");
         return reportRepository.findAll();
     }
 
     @Override
-    public ReportEntity save(Report report) {
-        log.info("Entro a la bdd - save");
+    public ReportEntity save(Report report) throws InvalidObjectException {
         return reportRepository.save(ReportPersistenceMapper.reportModelToReportEntity(report));
     }
 
     @Override
     public ReportEntity findById(String id) {
-        log.info("Entro a la bdd - findById");
         return reportRepository.findById(id).orElseThrow();
     }
 }

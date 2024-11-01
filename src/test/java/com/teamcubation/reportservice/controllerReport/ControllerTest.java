@@ -6,6 +6,7 @@ import com.teamcubation.reportservice.domain.customexceptions.report.InvalidType
 import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl.ReportController;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,15 +15,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class ControllerTest {
 
@@ -109,13 +106,13 @@ public class ControllerTest {
     }
 
     @Test
-    void whenGetAllReports_thenReturnAllReports() {
+    void whenGetAllReports_thenReturnAllReports() throws InvalidObjectException {
         when(reportInPort.getAllReports()).thenReturn(mockListReports());
         ResponseEntity<List<Report>> result = reportController.getAllReports();
         assertEquals(mockListReports(), result.getBody());
     }
     @Test
-    void whenGetAllReportsByEmail_thenReturnAllReports() {
+    void whenGetAllReportsByEmail_thenReturnAllReports() throws InvalidObjectException {
         when(reportInPort.findByUserEmail()).thenReturn(mockListReports());
         ResponseEntity<List<Report>> result = reportController.getReportsByEmail();
         assertEquals(mockListReports(), result.getBody());

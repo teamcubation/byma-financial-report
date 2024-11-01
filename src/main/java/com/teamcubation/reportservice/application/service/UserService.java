@@ -7,6 +7,7 @@ import com.teamcubation.reportservice.application.service.exception.UserDuplicat
 import com.teamcubation.reportservice.application.service.exception.UserNotFoundException;
 import com.teamcubation.reportservice.domain.model.user.Rol.Role;
 import com.teamcubation.reportservice.domain.model.user.User;
+import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +37,11 @@ public class UserService implements UserInPort {
     public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
         log.info("FCreating user: {}", user);
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new UserDuplicateException();
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }
 
         if (userOutPort.existsByNameIgnoreCase(user.getUsername())) {
-            throw new UserDuplicateException();
+            throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -68,7 +69,7 @@ public class UserService implements UserInPort {
         log.info("Existing user: {}", existingUser);
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
-                throw new UserDuplicateException("Email already exists");
+                throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
             }
             log.info("Updating email from {} to {}", existingUser.getEmail(), user.getEmail());
             existingUser.setEmail(user.getEmail());
@@ -76,7 +77,7 @@ public class UserService implements UserInPort {
 
         if (user.getUsername() != null) {
             if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
-                throw new UserDuplicateException("Username already exists");
+                throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
             }
             log.info("Updating username from {} to {}", existingUser.getUsername(), user.getUsername());
             existingUser.setUsername(user.getUsername());
@@ -102,8 +103,9 @@ public class UserService implements UserInPort {
     @Override
     public void delete(long id) throws UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.findById(id) == null) {
-            throw new UserEntityNotFoundException("User not found");
+            throw new UserEntityNotFoundException(MessageConstants.USER_ENTITY_NOT_FOUND);
         }
+      
         userOutPort.deleteUserById(id);
     }
 

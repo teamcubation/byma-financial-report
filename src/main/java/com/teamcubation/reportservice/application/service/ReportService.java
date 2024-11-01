@@ -11,6 +11,7 @@ import com.teamcubation.reportservice.domain.customexceptions.report.InvalidType
 import com.teamcubation.reportservice.domain.customexceptions.report.ReportNotFoundException;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.ReportEntity;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.ReportPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ReportService implements ReportInPort {
     private static final String INSTRUMENT_TYPE_NOT_SUPPORTED = "Instrument type not supported";
     private static final String REPORT_NOT_FOUND = "Report not found";
 
-    public byte[] generateFile(String typeFile, String typeInstrument) throws IOException {
+    public byte[] generateFile(String typeFile, String typeInstrument) throws IOException, InvalidObjectException {
         log.info("Generating file: typeFile={}, typeInstrument={}", typeFile, typeInstrument);
         byte[] fileContent = switch (typeFile) {
             case CSV_TYPE -> generateCsv(typeInstrument);
@@ -69,7 +70,7 @@ public class ReportService implements ReportInPort {
         throw new RuntimeException(USER_NOT_AUTHENTICATED);
     }
 
-    private Report createReport(byte[] reportContent, String userEmail, String typeFile, String typeInstrument) {
+    private Report createReport(byte[] reportContent, String userEmail, String typeFile, String typeInstrument) throws InvalidObjectException {
         log.info("Creating report for userEmail={}, typeFile={}, typeInstrument={}", userEmail, typeFile, typeInstrument);
         List<String> downloadUrls = new ArrayList<>();
         Report report = Report.builder()
@@ -131,32 +132,42 @@ public class ReportService implements ReportInPort {
         throw new InvalidInstrumentException(INSTRUMENT_TYPE_NOT_SUPPORTED);
     }
 
-    public List<Report> findByUserEmail() {
+    public List<Report> findByUserEmail() throws InvalidObjectException {
         String userEmail = getAuthenticatedUserEmail();
         log.info("Fetching reports for user: {}", userEmail);
         return getReportsByUserEmail(userEmail);
     }
 
     @Cacheable(value = "reportsCache", key = "#userEmail")
-    public List<Report> getReportsByUserEmail(String userEmail) {
+    public List<Report> getReportsByUserEmail(String userEmail) throws InvalidObjectException {
         log.info("Fetching reports from cache for user: {}", userEmail);
-        List<Report> reports = reportOutPort.findByUserEmail(userEmail).stream()
-                .map(ReportPersistenceMapper::reportEntityToReportModel)
-                .collect(Collectors.toList());
+
+        List<ReportEntity> reportsEntity = reportOutPort.findByUserEmail(userEmail);
+        List<Report> reports = new ArrayList<>();
+
+        for (ReportEntity reportEntity : reportsEntity) {
+            reports.add(ReportPersistenceMapper.reportEntityToReportModel(reportEntity));
+        }
+
         log.info("Reports fetched for user {}: {}", userEmail, reports.size());
         return reports;
     }
 
     @Cacheable(value = "allReportsCache")
-    public List<Report> getAllReports() {
+    public List<Report> getAllReports() throws InvalidObjectException  {
         log.info("Fetching all reports");
-        return reportOutPort.getAll().stream()
-                .map(ReportPersistenceMapper::reportEntityToReportModel)
-                .collect(Collectors.toList());
+        List<ReportEntity> entityReports = reportOutPort.getAll();
+        List<Report> reports = new ArrayList<>();
+
+        for (ReportEntity reportEntity : entityReports) {
+            reports.add(ReportPersistenceMapper.reportEntityToReportModel(reportEntity));
+        }
+
+        return reports;
     }
 
     @CacheEvict(value = "reportsCache", key = "#userEmail")
-    public Report save(Report report) {
+    public Report save(Report report) throws InvalidObjectException {
         log.info("Saving report: {}", report);
         String userEmail = getAuthenticatedUserEmail();
         return ReportPersistenceMapper.reportEntityToReportModel(reportOutPort.save(report));

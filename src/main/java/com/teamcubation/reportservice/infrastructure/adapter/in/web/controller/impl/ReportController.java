@@ -3,6 +3,7 @@ package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.
 import com.teamcubation.reportservice.application.port.in.ReportInPort;
 import com.teamcubation.reportservice.domain.model.report.Report;
 import com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.ApiReport;
+import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.exception.reportException.InvalidObjectException;
 import com.teamcubation.reportservice.util.AnsiColor;
 import com.teamcubation.reportservice.util.CurlGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,8 @@ public class ReportController implements ApiReport {
 
     @Override
     @GetMapping("/generateReport")
-    public ResponseEntity<byte[]> downloadFile(@RequestParam(defaultValue = "pdf") String typeFile, @RequestParam(required = false) String typeInstrument) throws IOException {
+    public ResponseEntity<byte[]> downloadFile(@RequestParam(defaultValue = "pdf") String typeFile, @RequestParam(required = false) String typeInstrument) throws IOException, InvalidObjectException {
+        byte[] fileContent = reportService.generateFile(typeFile, typeInstrument);
 
         Map<String, Object> params = new HashMap<>();
         params.put("typeFile", typeFile);
@@ -53,7 +55,7 @@ public class ReportController implements ApiReport {
     }
 
     @GetMapping("/reportHistory")
-    public ResponseEntity<List<Report>> getAllReports() {
+    public ResponseEntity<List<Report>> getAllReports()  throws InvalidObjectException {
         log.info(AnsiColor.BLUE + "Started getting all reports" + AnsiColor.RESET);
         List<Report> reports = reportService.getAllReports();
         log.info(AnsiColor.BLUE + "Finished reports found" + AnsiColor.RESET);
@@ -61,7 +63,7 @@ public class ReportController implements ApiReport {
     }
 
     @GetMapping("/reportHistoryByEmail")
-    public ResponseEntity<List<Report>> getReportsByEmail() {
+    public ResponseEntity<List<Report>> getReportsByEmail() throws InvalidObjectException {
         log.info(AnsiColor.BLUE + "Started getting reports by email" + AnsiColor.RESET);
         List<Report> reports = reportService.findByUserEmail();
         log.info(AnsiColor.BLUE + "Finished reports found finished" + AnsiColor.RESET);
