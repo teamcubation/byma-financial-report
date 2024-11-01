@@ -12,6 +12,7 @@ import com.teamcubation.reportservice.domain.model.user.UserRole;
 import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthService implements AuthInPort {
 
     public static final String ADMIN_EMAIL = "admin@gmail.com";
@@ -33,11 +35,13 @@ public class AuthService implements AuthInPort {
 
     @Override
     public String login(User user) throws UserNotFoundException, UserEntityNotFoundException {
+        log.info("Login user: {}", user);
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
                         user.getPassword()
                 ));
+
         User userFromDb = authOutPort.findByEmailIgnoreCase(user.getEmail());
         final String token = jwtService.generateToken(userFromDb);
         return token;
@@ -46,7 +50,7 @@ public class AuthService implements AuthInPort {
     //TODO Implementar reglas de negocio para el registro. Similar al del crud de users
     @Override
     public String register(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
-
+        log.info("Register user: {}", user);
         if (authOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }

@@ -11,6 +11,8 @@ import com.teamcubation.reportservice.exceptionHandler.utils.MessageConstants;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.adapter.user.exception.UserEntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,9 +31,11 @@ public class UserService implements UserInPort {
     private final RoleOutPort roleOutPort;
     private final PasswordEncoder passwordEncoder;
 
+
     //@CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User create(User user) throws UserDuplicateException, UserNotFoundException, UserEntityNotFoundException {
+        log.info("FCreating user: {}", user);
         if (userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
             throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
         }
@@ -52,18 +57,22 @@ public class UserService implements UserInPort {
 
     @Override
     public User findById(long id) throws UserNotFoundException, UserEntityNotFoundException {
-        return userOutPort.findById(id);
+        User user = userOutPort.findById(id);
+        log.info("User found by id: {}", user);
+        return user;
     }
 
     //@CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User update(User user) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
-
+        log.info("Updating user: {}", user);
         User existingUser = userOutPort.findById(user.getId());
+        log.info("Existing user: {}", existingUser);
         if (user.getEmail() != null) {
             if (!existingUser.getEmail().equals(user.getEmail()) && userOutPort.existsByEmailIgnoreCase(user.getEmail())) {
                 throw new UserDuplicateException(MessageConstants.DUPLICATED_EMAIL_USER);
             }
+            log.info("Updating email from {} to {}", existingUser.getEmail(), user.getEmail());
             existingUser.setEmail(user.getEmail());
         }
 
@@ -71,10 +80,13 @@ public class UserService implements UserInPort {
             if (!existingUser.getUsername().equals(user.getUsername()) && userOutPort.existsByNameIgnoreCase(user.getUsername())) {
                 throw new UserDuplicateException(MessageConstants.DUPLICATED_USERNAME_USER);
             }
+            log.info("Updating username from {} to {}", existingUser.getUsername(), user.getUsername());
             existingUser.setUsername(user.getUsername());
         }
 
         if (user.getRoles() != null) {
+            log.info("Updating role from {} to {}", existingUser.getRoles(), user.getRoles());
+
             Set<Role> roles = user.getRoles().stream()
                     .map(role -> roleOutPort.findByRole(role.getRole()).orElseGet(() -> roleOutPort.create(role)))
                     .collect(Collectors.toSet());
@@ -82,10 +94,9 @@ public class UserService implements UserInPort {
         }
 
         if (user.getPassword() != null) {
-            existingUser.setPassword(user.getPassword());
+            log.info("Updating password from {} to {}", existingUser.getPassword(), user.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-
-        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userOutPort.updateUser(existingUser);
     }
@@ -103,6 +114,7 @@ public class UserService implements UserInPort {
     //@Cacheable(value = "usersCache")
     @Override
     public List<User> getAll() throws UserNotFoundException {
+        log.info("Getting all users");
         return userOutPort.getAll();
     }
 

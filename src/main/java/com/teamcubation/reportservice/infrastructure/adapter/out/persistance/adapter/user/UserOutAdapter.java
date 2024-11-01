@@ -10,12 +10,13 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ent
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Slf4j
 @Repository
 @AllArgsConstructor
 public class UserOutAdapter implements UserOutPort {
@@ -25,8 +26,9 @@ public class UserOutAdapter implements UserOutPort {
     @Override
     public User registerUser(User user) throws UserEntityNotFoundException, UserNotFoundException {
         validateNullParams(user);
-  
+        log.info("Registering user: {}", user);
         UserEntity saved = userRepository.save(UserPersistenceMapper.userToUserEntity(user));
+        log.info("User saved: {}", saved);
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
@@ -64,11 +66,12 @@ public class UserOutAdapter implements UserOutPort {
 
     @Override
     public List<User> getAll() throws UserNotFoundException {
+        log.info("Getting all users");
         List<User> users = new ArrayList<>();
 
         List<UserEntity> userEntities = userRepository.findAll();
-      
-        for(UserEntity userEntity : userEntities) {
+        log.info("Users entities found: {}", userEntities);
+        for (UserEntity userEntity : userEntities) {
             users.add(UserPersistenceMapper.userEntityToUser(userEntity));
         }
       
@@ -78,9 +81,10 @@ public class UserOutAdapter implements UserOutPort {
     @Override
     public User updateUser(User user) throws UserNotFoundException, UserEntityNotFoundException {
         validateNullParams(user);
-      
+        log.info("Updating user: {}", user);
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         UserEntity updated = userRepository.save(userEntity);
+        log.info("User updated: {}", updated);
         return UserPersistenceMapper.userEntityToUser(updated);
     }
 
