@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrf(crs -> crs.disable())
                 .authorizeHttpRequests(authRequest -> authRequest
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/users/public/{id}").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/users/public/{id}").hasRole("USER")
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/report/reportHistory").hasRole("ADMIN")
                         .requestMatchers("/h2-console/**").permitAll() // Permitir acceso a la consola H2
