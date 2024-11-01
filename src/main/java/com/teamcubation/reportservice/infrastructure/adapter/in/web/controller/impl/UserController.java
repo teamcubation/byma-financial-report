@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl;
 
+import com.teamcubation.reportservice.application.port.in.RoleOutPort;
 import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
@@ -28,6 +29,7 @@ import java.util.List;
 public class UserController implements ApiUser {
 
     private final UserInPort userInPort;
+    private final RoleOutPort roleOutPort;
 
     @Override
     @PostMapping()

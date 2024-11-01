@@ -1,6 +1,7 @@
 package com.teamcubation.reportservice.application.service;
 
 import com.teamcubation.reportservice.application.port.in.AuthInPort;
+import com.teamcubation.reportservice.application.port.in.RoleOutPort;
 import com.teamcubation.reportservice.application.port.out.AuthOutPort;
 import com.teamcubation.reportservice.application.service.Jwt.JwtService;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
@@ -14,7 +15,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +26,8 @@ public class AuthService implements AuthInPort {
     public static final String ADMIN_EMAIL = "admin@gmail.com";
     private final AuthOutPort authOutPort;
     private final JwtService jwtService;
+    private final RoleOutPort roleOutPort;
+
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -54,6 +59,15 @@ public class AuthService implements AuthInPort {
             //user.setRoles(Set.of(Role.builder().role(UserRole.ADMIN).build()));
 
         }
+        Set<Role> roles = user.getRoles().stream()
+                .map(role -> {
+                    Optional<Role> optionalRole = roleOutPort.findByRole(role.getRole());
+                    return optionalRole.orElseGet(() -> roleOutPort.create(role));
+                })
+                .collect(Collectors.toSet());
+
+        user.setRoles(roles);
+
         User createdUser = authOutPort.register(user);
         String token = jwtService.generateToken(createdUser);
         return token;
