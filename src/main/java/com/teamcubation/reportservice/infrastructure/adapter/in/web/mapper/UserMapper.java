@@ -20,7 +20,6 @@ public class UserMapper {
 
     public static User userRequestToUser(Long id, UserRequest userRequest) throws InvalidUserModel {
         validateParams(userRequest);
-
         User user = User.builder()
                 .id(id)
                 .username(userRequest.getUsername())
@@ -88,8 +87,6 @@ public class UserMapper {
 
     private static void validateParams(Object... params) throws InvalidUserModel {
         if (ControllerValidator.isNull(params)) {
-            log.error("Params cannot be null");
-
             throw new InvalidUserModel("User not found");
         }
     }
