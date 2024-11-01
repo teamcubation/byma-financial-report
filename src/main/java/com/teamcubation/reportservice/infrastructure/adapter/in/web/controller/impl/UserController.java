@@ -35,7 +35,6 @@ public class UserController implements ApiUser {
     @PostMapping()
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         User user = UserMapper.userRequestToUser(null, userRequest);
-        //roleOutPort.findByRoleName();
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(userInPort.create(user)));
     }
 
