@@ -43,7 +43,7 @@ public class UserEntity {
 
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = RoleEntity.class , fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = RoleEntity.class , fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
