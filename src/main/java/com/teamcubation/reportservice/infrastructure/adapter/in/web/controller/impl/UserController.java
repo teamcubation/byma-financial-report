@@ -1,5 +1,6 @@
 package com.teamcubation.reportservice.infrastructure.adapter.in.web.controller.impl;
 
+import com.teamcubation.reportservice.application.port.in.RoleOutPort;
 import com.teamcubation.reportservice.application.port.in.UserInPort;
 import com.teamcubation.reportservice.application.service.exception.InvalidUserModel;
 import com.teamcubation.reportservice.application.service.exception.UserDuplicateException;
@@ -28,11 +29,13 @@ import java.util.List;
 public class UserController implements ApiUser {
 
     private final UserInPort userInPort;
+    private final RoleOutPort roleOutPort;
 
     @Override
     @PostMapping()
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userRequest) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException, InvalidUserModel {
         User user = UserMapper.userRequestToUser(null, userRequest);
+        //roleOutPort.findByRoleName();
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.userToUserResponse(userInPort.create(user)));
     }
 
