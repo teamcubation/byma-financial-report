@@ -61,7 +61,6 @@ public class UserService implements UserInPort {
         return user;
     }
 
-    //@CachePut(value = "usersCache", key = "#user.id")
     @Override
     public User update(User user) throws UserNotFoundException, UserEntityNotFoundException, UserDuplicateException {
         log.info("Updating user: {}", user);
@@ -100,7 +99,6 @@ public class UserService implements UserInPort {
         return userOutPort.updateUser(existingUser);
     }
 
-    //@CacheEvict(value = "usersCache", key = "#id")
     @Override
     public void delete(long id) throws UserNotFoundException, UserEntityNotFoundException {
         if (userOutPort.findById(id) == null) {
@@ -109,7 +107,6 @@ public class UserService implements UserInPort {
         userOutPort.deleteUserById(id);
     }
 
-    //@Cacheable(value = "usersCache")
     @Override
     public List<User> getAll() throws UserNotFoundException {
         log.info("Getting all users");

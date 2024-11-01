@@ -26,6 +26,4 @@ public interface UserOutPort {
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByNameIgnoreCase(String name);
-
-
 }

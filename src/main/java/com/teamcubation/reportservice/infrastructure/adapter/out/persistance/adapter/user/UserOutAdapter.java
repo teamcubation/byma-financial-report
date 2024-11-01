@@ -54,7 +54,6 @@ public class UserOutAdapter implements UserOutPort {
 
     @Override
     public User findById(Long id) throws UserNotFoundException, UserEntityNotFoundException {
-
         validateNullParams(id);
         UserEntity userById = userRepository
                 .findById(id)
