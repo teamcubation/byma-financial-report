@@ -7,13 +7,14 @@ import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.ada
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.entity.user.UserEntity;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.mapper.UserPersistenceMapper;
 import com.teamcubation.reportservice.infrastructure.adapter.out.persistance.repository.user.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AuthOutAdapter implements AuthOutPort {
 
     private final UserRepository userRepository;
@@ -27,26 +28,32 @@ public class AuthOutAdapter implements AuthOutPort {
 
     @Override
     public User register(User user) throws UserEntityNotFoundException, UserNotFoundException {
-
+        log.info("Register user: {}", user);
         UserEntity userEntity = UserPersistenceMapper.userToUserEntity(user);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
 
         UserEntity saved = userRepository.save(userEntity);
+        log.info("User saved: {}", saved);
         return UserPersistenceMapper.userEntityToUser(saved);
     }
 
     @Override
     public User findByEmailIgnoreCase(String email) throws UserEntityNotFoundException, UserNotFoundException {
-        return UserPersistenceMapper.userEntityToUser(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserEntityNotFoundException("User not found")));
+        log.info("Find user by email: {}", email);
+        User user = UserPersistenceMapper.userEntityToUser(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserEntityNotFoundException("User not found")));
+        log.info("User found: {}", user);
+        return user;
     }
 
     @Override
     public boolean existsByEmailIgnoreCase(String email) {
+        log.info("Check if user exists by email: {}", email);
         return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
     public boolean existsByUserNameIgnoreCase(String username) {
+        log.info("Check if user exists by username: {}", username);
         return userRepository.existsByUsernameIgnoreCase(username);
     }
 }
